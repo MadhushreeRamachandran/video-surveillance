@@ -6,9 +6,9 @@
     "tracker": "deepsort"
   },
   "summary": {
-    "total_events": 20,
+    "total_events": 17,
     "by_type": {
-      "zone_intrusion": 10,
+      "zone_intrusion": 7,
       "loitering": 10
     }
   },
@@ -371,66 +371,6 @@
         "stationary_seconds": 4.0,
         "radius_px": 26.6,
         "threshold_seconds": 4
-      }
-    },
-    {
-      "event_id": 18,
-      "event_type": "zone_intrusion",
-      "zone_id": "registration_desk",
-      "zone_name": "Registration Desk",
-      "track_id": 65,
-      "frame": 1858,
-      "timestamp_sec": 61.933,
-      "timecode": "00:01:01.933",
-      "bbox": [
-        102.9,
-        152.2,
-        116.9,
-        180.3
-      ],
-      "confidence": 0.366,
-      "details": {
-        "entered_at_sec": 61.367
-      }
-    },
-    {
-      "event_id": 19,
-      "event_type": "zone_intrusion",
-      "zone_id": "registration_desk",
-      "zone_name": "Registration Desk",
-      "track_id": 87,
-      "frame": 2058,
-      "timestamp_sec": 68.6,
-      "timecode": "00:01:08.600",
-      "bbox": [
-        102.4,
-        150.9,
-        113.1,
-        179.9
-      ],
-      "confidence": 0.437,
-      "details": {
-        "entered_at_sec": 68.267
-      }
-    },
-    {
-      "event_id": 20,
-      "event_type": "zone_intrusion",
-      "zone_id": "registration_desk",
-      "zone_name": "Registration Desk",
-      "track_id": 88,
-      "frame": 2224,
-      "timestamp_sec": 74.133,
-      "timecode": "00:01:14.133",
-      "bbox": [
-        105.4,
-        144.7,
-        123.0,
-        186.0
-      ],
-      "confidence": 0.451,
-      "details": {
-        "entered_at_sec": 73.767
       }
     }
   ]

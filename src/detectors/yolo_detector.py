@@ -77,16 +77,18 @@ class YoloDetector(Detector):
 
     # ------------------------------------------------------------- internals
     def _predict_kwargs(self) -> dict:
-        return dict(
-            classes=[self.PERSON_CLASS_ID],  # filter to people inside the model
+        kwargs = dict(
+            classes=[self.PERSON_CLASS_ID],
             conf=self.conf_threshold,
             iou=self.iou_threshold,
             imgsz=self.imgsz,
             device=self.device,
-            half=self.half,
             max_det=self.max_det,
             verbose=False,
         )
+        if self.half:  # only pass on CUDA, to avoid the deprecation warning on CPU
+            kwargs["half"] = True
+        return kwargs
 
     def _to_detections(self, result) -> List[Detection]:
         boxes = result.boxes

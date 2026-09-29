@@ -1,25 +1,26 @@
 {
   "coordinate_mode": "normalized",
   "defaults": {
-    "loiter_seconds": 5,
+    "loiter_seconds": 12,
     "loiter_radius_frac": 0.6,
-    "min_inside_seconds": 0.3,
-    "exit_grace_seconds": 2.0,
-    "cooldown_seconds": 10
+    "min_inside_seconds": 0.5,
+    "exit_grace_seconds": 3.0,
+    "cooldown_seconds": 20
   },
   "zones": [
     {
       "id": "registration_desk",
       "name": "Registration Desk",
       "polygon": [[0.0, 0.40], [0.22, 0.40], [0.28, 0.70], [0.0, 0.70]],
-      "events": ["intrusion", "loitering"]
+      "events": ["intrusion"],
+      "loiter_seconds": 20
     },
     {
       "id": "seating_area",
       "name": "Seating Area",
       "polygon": [[0.30, 0.35], [0.75, 0.30], [0.78, 0.55], [0.28, 0.62]],
       "events": ["loitering"],
-      "loiter_seconds": 4
+      "loiter_seconds": 8
     }
   ]
 }

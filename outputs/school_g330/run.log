@@ -75,3 +75,90 @@
 {"time": "2026-09-29 17:50:54", "level": "INFO", "logger": "__main__", "message": "Event log (CSV): ..\\outputs\\school_g330\\events.csv"}
 {"time": "2026-09-29 17:50:54", "level": "INFO", "logger": "__main__", "message": "Run manifest: ..\\outputs\\school_g330\\run_manifest.json"}
 {"time": "2026-09-29 17:50:54", "level": "INFO", "logger": "__main__", "message": "============================================================"}
+{"time": "2026-09-29 18:10:23", "level": "INFO", "logger": "__main__", "message": "============================================================"}
+{"time": "2026-09-29 18:10:23", "level": "INFO", "logger": "__main__", "message": "Video Surveillance Pipeline starting"}
+{"time": "2026-09-29 18:10:23", "level": "INFO", "logger": "__main__", "message": "Video: ..\\data\\clips\\school_g330.mp4 | Zones: ..\\data\\zones\\school_g330.zones.json | Output: ..\\outputs\\school_g330"}
+{"time": "2026-09-29 18:10:23", "level": "INFO", "logger": "__main__", "message": "Device: cpu"}
+{"time": "2026-09-29 18:10:23", "level": "INFO", "logger": "__main__", "message": "============================================================"}
+{"time": "2026-09-29 18:10:23", "level": "INFO", "logger": "utils.video_io", "message": "Opened school_g330.mp4: 480x360 @ 30.00 fps (~2254 frames)"}
+{"time": "2026-09-29 18:10:23", "level": "INFO", "logger": "detectors.yolo_detector", "message": "Loading yolov8n.pt on cpu (half=False)"}
+{"time": "2026-09-29 18:10:30", "level": "INFO", "logger": "deep_sort_realtime.embedder.embedder_pytorch", "message": "MobileNetV2 Embedder for Deep Sort initialised"}
+{"time": "2026-09-29 18:10:30", "level": "INFO", "logger": "deep_sort_realtime.embedder.embedder_pytorch", "message": "- gpu enabled: False"}
+{"time": "2026-09-29 18:10:30", "level": "INFO", "logger": "deep_sort_realtime.embedder.embedder_pytorch", "message": "- half precision: False"}
+{"time": "2026-09-29 18:10:30", "level": "INFO", "logger": "deep_sort_realtime.embedder.embedder_pytorch", "message": "- max batch size: 16"}
+{"time": "2026-09-29 18:10:30", "level": "INFO", "logger": "deep_sort_realtime.embedder.embedder_pytorch", "message": "- expects BGR: True"}
+{"time": "2026-09-29 18:10:31", "level": "INFO", "logger": "deep_sort_realtime.deepsort_tracker", "message": "DeepSort Tracker initialised"}
+{"time": "2026-09-29 18:10:31", "level": "INFO", "logger": "deep_sort_realtime.deepsort_tracker", "message": "- max age: 90"}
+{"time": "2026-09-29 18:10:31", "level": "INFO", "logger": "deep_sort_realtime.deepsort_tracker", "message": "- appearance threshold: 0.3"}
+{"time": "2026-09-29 18:10:31", "level": "INFO", "logger": "deep_sort_realtime.deepsort_tracker", "message": "- nms threshold: 0.7"}
+{"time": "2026-09-29 18:10:31", "level": "INFO", "logger": "deep_sort_realtime.deepsort_tracker", "message": "- max num of appearance features: 100"}
+{"time": "2026-09-29 18:10:31", "level": "INFO", "logger": "deep_sort_realtime.deepsort_tracker", "message": "- overriding track class : No"}
+{"time": "2026-09-29 18:10:31", "level": "INFO", "logger": "deep_sort_realtime.deepsort_tracker", "message": "- today given : No"}
+{"time": "2026-09-29 18:10:31", "level": "INFO", "logger": "deep_sort_realtime.deepsort_tracker", "message": "- in-build embedder : Yes"}
+{"time": "2026-09-29 18:10:31", "level": "INFO", "logger": "deep_sort_realtime.deepsort_tracker", "message": "- polygon detections : No"}
+{"time": "2026-09-29 18:10:31", "level": "INFO", "logger": "trackers.deepsort_tracker", "message": "DeepSORT ready (embedder=mobilenet, gpu=False, {'max_age': 90, 'n_init': 3, 'max_cosine_distance': 0.3, 'nn_budget': 100, 'nms_max_overlap': 0.7})"}
+{"time": "2026-09-29 18:10:31", "level": "INFO", "logger": "events.zones", "message": "Loaded 2 zone(s) from ..\\data\\zones\\school_g330.zones.json (normalized coordinates)"}
+{"time": "2026-09-29 18:10:31", "level": "INFO", "logger": "__main__", "message": "Detector: yolov8 (weights=yolov8n.pt, conf=0.35)"}
+{"time": "2026-09-29 18:10:31", "level": "INFO", "logger": "__main__", "message": "Tracker: deepsort"}
+{"time": "2026-09-29 18:10:31", "level": "INFO", "logger": "__main__", "message": "Zones: Registration Desk[registration_desk], Seating Area[seating_area]"}
+{"time": "2026-09-29 18:11:00", "level": "WARNING", "logger": "events.observers", "message": "ALERT zone_intrusion zone=registration_desk track=4 frame=44 t=00:00:01.467 conf=0.39"}
+{"time": "2026-09-29 18:11:19", "level": "WARNING", "logger": "events.observers", "message": "ALERT zone_intrusion zone=registration_desk track=8 frame=81 t=00:00:02.700 conf=0.53"}
+{"time": "2026-09-29 18:12:04", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 200 frames (2.1 fps, 2 events so far)"}
+{"time": "2026-09-29 18:12:56", "level": "WARNING", "logger": "events.observers", "message": "ALERT loitering      zone=seating_area track=7 frame=341 t=00:00:11.367 conf=0.42"}
+{"time": "2026-09-29 18:12:58", "level": "WARNING", "logger": "events.observers", "message": "ALERT zone_intrusion zone=registration_desk track=4 frame=346 t=00:00:11.533 conf=0.42"}
+{"time": "2026-09-29 18:13:24", "level": "WARNING", "logger": "events.observers", "message": "ALERT loitering      zone=seating_area track=8 frame=396 t=00:00:13.200 conf=0.49"}
+{"time": "2026-09-29 18:13:26", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 400 frames (2.3 fps, 5 events so far)"}
+{"time": "2026-09-29 18:14:44", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 600 frames (2.4 fps, 5 events so far)"}
+{"time": "2026-09-29 18:15:05", "level": "WARNING", "logger": "events.observers", "message": "ALERT loitering      zone=seating_area track=31 frame=674 t=00:00:22.467 conf=0.47"}
+{"time": "2026-09-29 18:15:29", "level": "WARNING", "logger": "events.observers", "message": "ALERT loitering      zone=seating_area track=16 frame=744 t=00:00:24.800 conf=0.47"}
+{"time": "2026-09-29 18:15:31", "level": "WARNING", "logger": "events.observers", "message": "ALERT zone_intrusion zone=registration_desk track=36 frame=750 t=00:00:25.000 conf=0.56"}
+{"time": "2026-09-29 18:15:42", "level": "WARNING", "logger": "events.observers", "message": "ALERT loitering      zone=seating_area track=30 frame=775 t=00:00:25.833 conf=0.44"}
+{"time": "2026-09-29 18:15:53", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 800 frames (2.5 fps, 9 events so far)"}
+{"time": "2026-09-29 18:16:34", "level": "WARNING", "logger": "events.observers", "message": "ALERT zone_intrusion zone=registration_desk track=43 frame=907 t=00:00:30.233 conf=0.43"}
+{"time": "2026-09-29 18:17:13", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 1000 frames (2.5 fps, 10 events so far)"}
+{"time": "2026-09-29 18:18:10", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 1200 frames (2.6 fps, 10 events so far)"}
+{"time": "2026-09-29 18:18:25", "level": "WARNING", "logger": "events.observers", "message": "ALERT loitering      zone=seating_area track=46 frame=1239 t=00:00:41.300 conf=0.37"}
+{"time": "2026-09-29 18:18:28", "level": "WARNING", "logger": "events.observers", "message": "ALERT loitering      zone=seating_area track=16 frame=1245 t=00:00:41.500 conf=0.52"}
+{"time": "2026-09-29 18:18:49", "level": "WARNING", "logger": "events.observers", "message": "ALERT loitering      zone=seating_area track=60 frame=1285 t=00:00:42.833 conf=0.41"}
+{"time": "2026-09-29 18:51:12", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 1400 frames (0.6 fps, 13 events so far)"}
+{"time": "2026-09-29 18:51:44", "level": "WARNING", "logger": "events.observers", "message": "ALERT zone_intrusion zone=registration_desk track=59 frame=1458 t=00:00:48.600 conf=0.42"}
+{"time": "2026-09-29 18:52:09", "level": "WARNING", "logger": "events.observers", "message": "ALERT zone_intrusion zone=registration_desk track=65 frame=1498 t=00:00:49.933 conf=0.50"}
+{"time": "2026-09-29 18:52:36", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 1600 frames (0.6 fps, 15 events so far)"}
+{"time": "2026-09-29 18:53:00", "level": "WARNING", "logger": "events.observers", "message": "ALERT loitering      zone=seating_area track=65 frame=1669 t=00:00:55.633 conf=0.43"}
+{"time": "2026-09-29 18:53:46", "level": "WARNING", "logger": "events.observers", "message": "ALERT loitering      zone=seating_area track=80 frame=1768 t=00:00:58.933 conf=0.37"}
+{"time": "2026-09-29 18:54:05", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 1800 frames (0.7 fps, 17 events so far)"}
+{"time": "2026-09-29 18:54:08", "level": "INFO", "logger": "utils.video_io", "message": "Wrote 1805 frames to ..\\outputs\\school_g330\\annotated.mp4 (codec=mp4v)"}
+{"time": "2026-09-29 18:54:08", "level": "INFO", "logger": "utils.video_io", "message": "school_g330.mp4: read=1806 skipped=0 dropped=0"}
+{"time": "2026-09-29 18:54:08", "level": "WARNING", "logger": "__main__", "message": "Interrupted by user; partial results (if any) were already flushed to disk."}
+{"time": "2026-09-29 18:54:30", "level": "INFO", "logger": "__main__", "message": "============================================================"}
+{"time": "2026-09-29 18:54:30", "level": "INFO", "logger": "__main__", "message": "Video Surveillance Pipeline starting"}
+{"time": "2026-09-29 18:54:30", "level": "INFO", "logger": "__main__", "message": "Video: ..\\data\\clips\\school_g330.mp4 | Zones: ..\\data\\zones\\school_g330.zones.json | Output: ..\\outputs\\school_g330"}
+{"time": "2026-09-29 18:54:30", "level": "INFO", "logger": "__main__", "message": "Device: cpu"}
+{"time": "2026-09-29 18:54:30", "level": "INFO", "logger": "__main__", "message": "============================================================"}
+{"time": "2026-09-29 18:54:31", "level": "INFO", "logger": "utils.video_io", "message": "Opened school_g330.mp4: 480x360 @ 30.00 fps (~2254 frames)"}
+{"time": "2026-09-29 18:54:31", "level": "INFO", "logger": "detectors.yolo_detector", "message": "Loading yolov8n.pt on cpu (half=False)"}
+{"time": "2026-09-29 18:54:39", "level": "INFO", "logger": "deep_sort_realtime.embedder.embedder_pytorch", "message": "MobileNetV2 Embedder for Deep Sort initialised"}
+{"time": "2026-09-29 18:54:39", "level": "INFO", "logger": "deep_sort_realtime.embedder.embedder_pytorch", "message": "- gpu enabled: False"}
+{"time": "2026-09-29 18:54:39", "level": "INFO", "logger": "deep_sort_realtime.embedder.embedder_pytorch", "message": "- half precision: False"}
+{"time": "2026-09-29 18:54:39", "level": "INFO", "logger": "deep_sort_realtime.embedder.embedder_pytorch", "message": "- max batch size: 16"}
+{"time": "2026-09-29 18:54:39", "level": "INFO", "logger": "deep_sort_realtime.embedder.embedder_pytorch", "message": "- expects BGR: True"}
+{"time": "2026-09-29 18:54:39", "level": "INFO", "logger": "deep_sort_realtime.deepsort_tracker", "message": "DeepSort Tracker initialised"}
+{"time": "2026-09-29 18:54:39", "level": "INFO", "logger": "deep_sort_realtime.deepsort_tracker", "message": "- max age: 90"}
+{"time": "2026-09-29 18:54:39", "level": "INFO", "logger": "deep_sort_realtime.deepsort_tracker", "message": "- appearance threshold: 0.3"}
+{"time": "2026-09-29 18:54:39", "level": "INFO", "logger": "deep_sort_realtime.deepsort_tracker", "message": "- nms threshold: 0.7"}
+{"time": "2026-09-29 18:54:39", "level": "INFO", "logger": "deep_sort_realtime.deepsort_tracker", "message": "- max num of appearance features: 100"}
+{"time": "2026-09-29 18:54:39", "level": "INFO", "logger": "deep_sort_realtime.deepsort_tracker", "message": "- overriding track class : No"}
+{"time": "2026-09-29 18:54:39", "level": "INFO", "logger": "deep_sort_realtime.deepsort_tracker", "message": "- today given : No"}
+{"time": "2026-09-29 18:54:39", "level": "INFO", "logger": "deep_sort_realtime.deepsort_tracker", "message": "- in-build embedder : Yes"}
+{"time": "2026-09-29 18:54:39", "level": "INFO", "logger": "deep_sort_realtime.deepsort_tracker", "message": "- polygon detections : No"}
+{"time": "2026-09-29 18:54:39", "level": "INFO", "logger": "trackers.deepsort_tracker", "message": "DeepSORT ready (embedder=mobilenet, gpu=False, {'max_age': 90, 'n_init': 3, 'max_cosine_distance': 0.3, 'nn_budget': 100, 'nms_max_overlap': 0.7})"}
+{"time": "2026-09-29 18:54:39", "level": "INFO", "logger": "events.zones", "message": "Loaded 2 zone(s) from ..\\data\\zones\\school_g330.zones.json (normalized coordinates)"}
+{"time": "2026-09-29 18:54:39", "level": "INFO", "logger": "__main__", "message": "Detector: yolov8 (weights=yolov8n.pt, conf=0.35)"}
+{"time": "2026-09-29 18:54:39", "level": "INFO", "logger": "__main__", "message": "Tracker: deepsort"}
+{"time": "2026-09-29 18:54:39", "level": "INFO", "logger": "__main__", "message": "Zones: Registration Desk[registration_desk], Seating Area[seating_area]"}
+{"time": "2026-09-29 18:55:11", "level": "WARNING", "logger": "events.observers", "message": "ALERT zone_intrusion zone=registration_desk track=4 frame=44 t=00:00:01.467 conf=0.39"}
+{"time": "2026-09-29 18:55:33", "level": "WARNING", "logger": "events.observers", "message": "ALERT zone_intrusion zone=registration_desk track=8 frame=81 t=00:00:02.700 conf=0.53"}
+{"time": "2026-09-29 18:56:21", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 200 frames (2.0 fps, 2 events so far)"}
+{"time": "2026-09-29 18:57:42", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 400 frames (2.2 fps, 2 events so far)"}
+{"time": "2026-09-29 18:58:07", "level": "WARNING", "logger": "events.observers", "message": "ALERT loitering      zone=seating_area track=7 frame=461 t=00:00:15.367 conf=0.42"}
+{"time": "2026-09-29 18:58:21", "level": "WARNING", "logger": "events.observers", "message": "ALERT loitering      zone=seating_area track=8 frame=495 t=00:00:16.500 conf=0.44"}
