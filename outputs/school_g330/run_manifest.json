@@ -1,0 +1,64 @@
+{
+  "config": {
+    "video_path": "..\\data\\clips\\school_g330.mp4",
+    "zones_path": "..\\data\\zones\\school_g330.zones.json",
+    "detector": {
+      "name": "yolov8",
+      "weights": "yolov8n.pt",
+      "conf_threshold": 0.35,
+      "iou_threshold": 0.5,
+      "imgsz": 640,
+      "device": "auto"
+    },
+    "tracker": {
+      "name": "deepsort",
+      "params": {
+        "max_age": 90,
+        "n_init": 3,
+        "max_cosine_distance": 0.3,
+        "nn_budget": 100
+      }
+    },
+    "frame_skip": 0,
+    "anchor": "foot",
+    "output_dir": "..\\outputs\\school_g330"
+  },
+  "environment": {
+    "python": "3.13.7",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "git_commit": "d20432a",
+    "packages": {
+      "ultralytics": "8.4.164",
+      "cv2": "5.0.0",
+      "shapely": "2.1.2",
+      "deep_sort_realtime": "1.3.2",
+      "torch": "2.14.0+cpu",
+      "numpy": "2.5.3"
+    },
+    "cuda_available": false,
+    "gpu_name": null
+  },
+  "video_info": {
+    "width": 480,
+    "height": 360,
+    "fps": 30.0,
+    "frame_count": 2254
+  },
+  "timing": {
+    "started_at": 1790683497.0745344,
+    "ended_at": 1790684454.7336118,
+    "duration_sec": 957.66
+  },
+  "stats": {
+    "frames_processed": 2254,
+    "total_detections": 9132,
+    "total_events": 20,
+    "events_by_type": {
+      "zone_intrusion": 10,
+      "loitering": 10
+    },
+    "elapsed_sec": 949.4,
+    "avg_fps": 2.37
+  },
+  "error": null
+}

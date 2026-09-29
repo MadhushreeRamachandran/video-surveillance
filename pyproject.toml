@@ -8,10 +8,12 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
+    "ultralytics>=8.2.0",
+    "opencv-python>=4.8.0",
+    "shapely>=2.0.0",
     "deep-sort-realtime>=1.3.2",
-    "opencv-python>=5.0.0.93",
-    "shapely>=2.1.2",
-    "ultralytics>=8.4.164",
+    "numpy>=1.24.0",
+    "setuptools<81",
 ]
 
 [project.scripts]
@@ -20,3 +22,5 @@ video-surveillance = "video_surveillance:main"
 [build-system]
 requires = ["uv_build>=0.12.19,<0.13.0"]
 build-backend = "uv_build"
+[tool.uv]
+package = false

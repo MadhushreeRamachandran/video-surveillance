@@ -1,0 +1,437 @@
+{
+  "metadata": {
+    "video": "..\\data\\clips\\school_g330.mp4",
+    "zones": "..\\data\\zones\\school_g330.zones.json",
+    "detector": "yolov8",
+    "tracker": "deepsort"
+  },
+  "summary": {
+    "total_events": 20,
+    "by_type": {
+      "zone_intrusion": 10,
+      "loitering": 10
+    }
+  },
+  "events": [
+    {
+      "event_id": 1,
+      "event_type": "zone_intrusion",
+      "zone_id": "registration_desk",
+      "zone_name": "Registration Desk",
+      "track_id": 4,
+      "frame": 44,
+      "timestamp_sec": 1.467,
+      "timecode": "00:00:01.467",
+      "bbox": [
+        96.5,
+        191.2,
+        114.4,
+        251.8
+      ],
+      "confidence": 0.387,
+      "details": {
+        "entered_at_sec": 0.4
+      }
+    },
+    {
+      "event_id": 2,
+      "event_type": "zone_intrusion",
+      "zone_id": "registration_desk",
+      "zone_name": "Registration Desk",
+      "track_id": 8,
+      "frame": 81,
+      "timestamp_sec": 2.7,
+      "timecode": "00:00:02.700",
+      "bbox": [
+        118.9,
+        161.2,
+        145.2,
+        250.7
+      ],
+      "confidence": 0.533,
+      "details": {
+        "entered_at_sec": 2.0
+      }
+    },
+    {
+      "event_id": 3,
+      "event_type": "loitering",
+      "zone_id": "seating_area",
+      "zone_name": "Seating Area",
+      "track_id": 7,
+      "frame": 341,
+      "timestamp_sec": 11.367,
+      "timecode": "00:00:11.367",
+      "bbox": [
+        179.8,
+        142.9,
+        191.9,
+        172.7
+      ],
+      "confidence": 0.424,
+      "details": {
+        "stationary_seconds": 4.0,
+        "radius_px": 17.9,
+        "threshold_seconds": 4
+      }
+    },
+    {
+      "event_id": 4,
+      "event_type": "zone_intrusion",
+      "zone_id": "registration_desk",
+      "zone_name": "Registration Desk",
+      "track_id": 4,
+      "frame": 346,
+      "timestamp_sec": 11.533,
+      "timecode": "00:00:11.533",
+      "bbox": [
+        109.8,
+        155.1,
+        123.3,
+        186.7
+      ],
+      "confidence": 0.418,
+      "details": {
+        "entered_at_sec": 11.233
+      }
+    },
+    {
+      "event_id": 5,
+      "event_type": "loitering",
+      "zone_id": "seating_area",
+      "zone_name": "Seating Area",
+      "track_id": 8,
+      "frame": 396,
+      "timestamp_sec": 13.2,
+      "timecode": "00:00:13.200",
+      "bbox": [
+        248.5,
+        157.1,
+        265.9,
+        204.9
+      ],
+      "confidence": 0.49,
+      "details": {
+        "stationary_seconds": 4.7,
+        "radius_px": 28.7,
+        "threshold_seconds": 4
+      }
+    },
+    {
+      "event_id": 6,
+      "event_type": "loitering",
+      "zone_id": "seating_area",
+      "zone_name": "Seating Area",
+      "track_id": 31,
+      "frame": 674,
+      "timestamp_sec": 22.467,
+      "timecode": "00:00:22.467",
+      "bbox": [
+        241.8,
+        161.5,
+        263.5,
+        204.2
+      ],
+      "confidence": 0.471,
+      "details": {
+        "stationary_seconds": 4.0,
+        "radius_px": 25.6,
+        "threshold_seconds": 4
+      }
+    },
+    {
+      "event_id": 7,
+      "event_type": "loitering",
+      "zone_id": "seating_area",
+      "zone_name": "Seating Area",
+      "track_id": 16,
+      "frame": 744,
+      "timestamp_sec": 24.8,
+      "timecode": "00:00:24.800",
+      "bbox": [
+        180.2,
+        144.1,
+        191.4,
+        171.3
+      ],
+      "confidence": 0.471,
+      "details": {
+        "stationary_seconds": 4.0,
+        "radius_px": 16.3,
+        "threshold_seconds": 4
+      }
+    },
+    {
+      "event_id": 8,
+      "event_type": "zone_intrusion",
+      "zone_id": "registration_desk",
+      "zone_name": "Registration Desk",
+      "track_id": 36,
+      "frame": 750,
+      "timestamp_sec": 25.0,
+      "timecode": "00:00:25.000",
+      "bbox": [
+        108.0,
+        150.3,
+        122.3,
+        187.3
+      ],
+      "confidence": 0.564,
+      "details": {
+        "entered_at_sec": 24.133
+      }
+    },
+    {
+      "event_id": 9,
+      "event_type": "loitering",
+      "zone_id": "seating_area",
+      "zone_name": "Seating Area",
+      "track_id": 30,
+      "frame": 775,
+      "timestamp_sec": 25.833,
+      "timecode": "00:00:25.833",
+      "bbox": [
+        203.7,
+        149.8,
+        217.9,
+        181.0
+      ],
+      "confidence": 0.436,
+      "details": {
+        "stationary_seconds": 4.0,
+        "radius_px": 18.7,
+        "threshold_seconds": 4
+      }
+    },
+    {
+      "event_id": 10,
+      "event_type": "zone_intrusion",
+      "zone_id": "registration_desk",
+      "zone_name": "Registration Desk",
+      "track_id": 43,
+      "frame": 907,
+      "timestamp_sec": 30.233,
+      "timecode": "00:00:30.233",
+      "bbox": [
+        101.8,
+        151.6,
+        113.3,
+        179.9
+      ],
+      "confidence": 0.435,
+      "details": {
+        "entered_at_sec": 29.533
+      }
+    },
+    {
+      "event_id": 11,
+      "event_type": "loitering",
+      "zone_id": "seating_area",
+      "zone_name": "Seating Area",
+      "track_id": 46,
+      "frame": 1239,
+      "timestamp_sec": 41.3,
+      "timecode": "00:00:41.300",
+      "bbox": [
+        249.3,
+        155.4,
+        267.8,
+        204.1
+      ],
+      "confidence": 0.372,
+      "details": {
+        "stationary_seconds": 4.13,
+        "radius_px": 29.2,
+        "threshold_seconds": 4
+      }
+    },
+    {
+      "event_id": 12,
+      "event_type": "loitering",
+      "zone_id": "seating_area",
+      "zone_name": "Seating Area",
+      "track_id": 16,
+      "frame": 1245,
+      "timestamp_sec": 41.5,
+      "timecode": "00:00:41.500",
+      "bbox": [
+        204.6,
+        149.7,
+        217.9,
+        181.0
+      ],
+      "confidence": 0.521,
+      "details": {
+        "stationary_seconds": 4.0,
+        "radius_px": 18.8,
+        "threshold_seconds": 4
+      }
+    },
+    {
+      "event_id": 13,
+      "event_type": "loitering",
+      "zone_id": "seating_area",
+      "zone_name": "Seating Area",
+      "track_id": 60,
+      "frame": 1285,
+      "timestamp_sec": 42.833,
+      "timecode": "00:00:42.833",
+      "bbox": [
+        179.8,
+        143.4,
+        193.0,
+        174.3
+      ],
+      "confidence": 0.405,
+      "details": {
+        "stationary_seconds": 4.0,
+        "radius_px": 18.5,
+        "threshold_seconds": 4
+      }
+    },
+    {
+      "event_id": 14,
+      "event_type": "zone_intrusion",
+      "zone_id": "registration_desk",
+      "zone_name": "Registration Desk",
+      "track_id": 59,
+      "frame": 1458,
+      "timestamp_sec": 48.6,
+      "timecode": "00:00:48.600",
+      "bbox": [
+        106.8,
+        153.2,
+        122.2,
+        182.6
+      ],
+      "confidence": 0.421,
+      "details": {
+        "entered_at_sec": 46.567
+      }
+    },
+    {
+      "event_id": 15,
+      "event_type": "zone_intrusion",
+      "zone_id": "registration_desk",
+      "zone_name": "Registration Desk",
+      "track_id": 65,
+      "frame": 1498,
+      "timestamp_sec": 49.933,
+      "timecode": "00:00:49.933",
+      "bbox": [
+        77.7,
+        142.6,
+        91.4,
+        182.5
+      ],
+      "confidence": 0.498,
+      "details": {
+        "entered_at_sec": 49.433
+      }
+    },
+    {
+      "event_id": 16,
+      "event_type": "loitering",
+      "zone_id": "seating_area",
+      "zone_name": "Seating Area",
+      "track_id": 65,
+      "frame": 1669,
+      "timestamp_sec": 55.633,
+      "timecode": "00:00:55.633",
+      "bbox": [
+        179.6,
+        143.1,
+        192.3,
+        173.4
+      ],
+      "confidence": 0.426,
+      "details": {
+        "stationary_seconds": 4.1,
+        "radius_px": 18.2,
+        "threshold_seconds": 4
+      }
+    },
+    {
+      "event_id": 17,
+      "event_type": "loitering",
+      "zone_id": "seating_area",
+      "zone_name": "Seating Area",
+      "track_id": 80,
+      "frame": 1768,
+      "timestamp_sec": 58.933,
+      "timecode": "00:00:58.933",
+      "bbox": [
+        249.2,
+        158.4,
+        270.8,
+        202.8
+      ],
+      "confidence": 0.372,
+      "details": {
+        "stationary_seconds": 4.0,
+        "radius_px": 26.6,
+        "threshold_seconds": 4
+      }
+    },
+    {
+      "event_id": 18,
+      "event_type": "zone_intrusion",
+      "zone_id": "registration_desk",
+      "zone_name": "Registration Desk",
+      "track_id": 65,
+      "frame": 1858,
+      "timestamp_sec": 61.933,
+      "timecode": "00:01:01.933",
+      "bbox": [
+        102.9,
+        152.2,
+        116.9,
+        180.3
+      ],
+      "confidence": 0.366,
+      "details": {
+        "entered_at_sec": 61.367
+      }
+    },
+    {
+      "event_id": 19,
+      "event_type": "zone_intrusion",
+      "zone_id": "registration_desk",
+      "zone_name": "Registration Desk",
+      "track_id": 87,
+      "frame": 2058,
+      "timestamp_sec": 68.6,
+      "timecode": "00:01:08.600",
+      "bbox": [
+        102.4,
+        150.9,
+        113.1,
+        179.9
+      ],
+      "confidence": 0.437,
+      "details": {
+        "entered_at_sec": 68.267
+      }
+    },
+    {
+      "event_id": 20,
+      "event_type": "zone_intrusion",
+      "zone_id": "registration_desk",
+      "zone_name": "Registration Desk",
+      "track_id": 88,
+      "frame": 2224,
+      "timestamp_sec": 74.133,
+      "timecode": "00:01:14.133",
+      "bbox": [
+        105.4,
+        144.7,
+        123.0,
+        186.0
+      ],
+      "confidence": 0.451,
+      "details": {
+        "entered_at_sec": 73.767
+      }
+    }
+  ]
+}
