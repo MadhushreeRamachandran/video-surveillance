@@ -162,3 +162,33 @@
 {"time": "2026-09-29 18:57:42", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 400 frames (2.2 fps, 2 events so far)"}
 {"time": "2026-09-29 18:58:07", "level": "WARNING", "logger": "events.observers", "message": "ALERT loitering      zone=seating_area track=7 frame=461 t=00:00:15.367 conf=0.42"}
 {"time": "2026-09-29 18:58:21", "level": "WARNING", "logger": "events.observers", "message": "ALERT loitering      zone=seating_area track=8 frame=495 t=00:00:16.500 conf=0.44"}
+{"time": "2026-09-29 18:59:12", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 600 frames (2.2 fps, 4 events so far)"}
+{"time": "2026-09-29 19:00:05", "level": "WARNING", "logger": "events.observers", "message": "ALERT zone_intrusion zone=registration_desk track=36 frame=750 t=00:00:25.000 conf=0.56"}
+{"time": "2026-09-29 19:00:25", "level": "WARNING", "logger": "events.observers", "message": "ALERT loitering      zone=seating_area track=31 frame=794 t=00:00:26.467 conf=0.48"}
+{"time": "2026-09-29 19:00:27", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 800 frames (2.3 fps, 6 events so far)"}
+{"time": "2026-09-29 19:00:49", "level": "WARNING", "logger": "events.observers", "message": "ALERT loitering      zone=seating_area track=16 frame=864 t=00:00:28.800 conf=0.46"}
+{"time": "2026-09-29 19:01:04", "level": "WARNING", "logger": "events.observers", "message": "ALERT loitering      zone=seating_area track=30 frame=895 t=00:00:29.833 conf=0.47"}
+{"time": "2026-09-29 19:01:11", "level": "WARNING", "logger": "events.observers", "message": "ALERT zone_intrusion zone=registration_desk track=43 frame=907 t=00:00:30.233 conf=0.43"}
+{"time": "2026-09-29 19:02:00", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 1000 frames (2.3 fps, 9 events so far)"}
+{"time": "2026-09-29 19:02:57", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 1200 frames (2.4 fps, 9 events so far)"}
+{"time": "2026-09-29 19:04:23", "level": "WARNING", "logger": "events.observers", "message": "ALERT loitering      zone=seating_area track=46 frame=1370 t=00:00:45.667 conf=0.40"}
+{"time": "2026-09-29 19:04:36", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 1400 frames (2.3 fps, 10 events so far)"}
+{"time": "2026-09-29 19:05:03", "level": "WARNING", "logger": "events.observers", "message": "ALERT zone_intrusion zone=registration_desk track=59 frame=1458 t=00:00:48.600 conf=0.42"}
+{"time": "2026-09-29 19:05:18", "level": "WARNING", "logger": "events.observers", "message": "ALERT zone_intrusion zone=registration_desk track=65 frame=1498 t=00:00:49.933 conf=0.50"}
+{"time": "2026-09-29 19:05:41", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 1600 frames (2.4 fps, 12 events so far)"}
+{"time": "2026-09-29 19:06:44", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 1800 frames (2.5 fps, 12 events so far)"}
+{"time": "2026-09-29 19:07:56", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 2000 frames (2.5 fps, 12 events so far)"}
+{"time": "2026-09-29 19:08:13", "level": "WARNING", "logger": "events.observers", "message": "ALERT zone_intrusion zone=registration_desk track=87 frame=2063 t=00:01:08.767 conf=0.49"}
+{"time": "2026-09-29 19:08:51", "level": "INFO", "logger": "pipeline.pipeline", "message": "Processed 2200 frames (2.6 fps, 13 events so far)"}
+{"time": "2026-09-29 19:08:59", "level": "WARNING", "logger": "events.observers", "message": "ALERT zone_intrusion zone=registration_desk track=88 frame=2234 t=00:01:14.467 conf=0.44"}
+{"time": "2026-09-29 19:16:46", "level": "INFO", "logger": "utils.video_io", "message": "Stopping after 30 consecutive failed reads (likely end of stream, at frame 2283)"}
+{"time": "2026-09-29 19:16:47", "level": "INFO", "logger": "utils.video_io", "message": "Wrote 2254 frames to ..\\outputs\\school_g330\\annotated.mp4 (codec=mp4v)"}
+{"time": "2026-09-29 19:16:47", "level": "INFO", "logger": "utils.video_io", "message": "school_g330.mp4: read=2254 skipped=0 dropped=30"}
+{"time": "2026-09-29 19:16:47", "level": "INFO", "logger": "__main__", "message": "============================================================"}
+{"time": "2026-09-29 19:16:47", "level": "INFO", "logger": "__main__", "message": "Run complete: 2254 frames in 1327.5s (1.7 fps avg)"}
+{"time": "2026-09-29 19:16:47", "level": "INFO", "logger": "__main__", "message": "Events: 14 total {'zone_intrusion': 8, 'loitering': 6}"}
+{"time": "2026-09-29 19:16:47", "level": "INFO", "logger": "__main__", "message": "Annotated video: ..\\outputs\\school_g330\\annotated.mp4"}
+{"time": "2026-09-29 19:16:47", "level": "INFO", "logger": "__main__", "message": "Event log (JSON): ..\\outputs\\school_g330\\events.json"}
+{"time": "2026-09-29 19:16:47", "level": "INFO", "logger": "__main__", "message": "Event log (CSV): ..\\outputs\\school_g330\\events.csv"}
+{"time": "2026-09-29 19:16:47", "level": "INFO", "logger": "__main__", "message": "Run manifest: ..\\outputs\\school_g330\\run_manifest.json"}
+{"time": "2026-09-29 19:16:48", "level": "INFO", "logger": "__main__", "message": "============================================================"}

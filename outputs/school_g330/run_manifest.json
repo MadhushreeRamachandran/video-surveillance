@@ -26,7 +26,7 @@
   "environment": {
     "python": "3.13.7",
     "platform": "Windows-11-10.0.26200-SP0",
-    "git_commit": "76612ca",
+    "git_commit": "879d454",
     "packages": {
       "ultralytics": "8.4.164",
       "cv2": "5.0.0",
@@ -45,10 +45,20 @@
     "frame_count": 2254
   },
   "timing": {
-    "started_at": 1790685623.38876,
-    "ended_at": 1790688248.2803018,
-    "duration_sec": 2624.89
+    "started_at": 1790688270.9968603,
+    "ended_at": 1790689607.6258938,
+    "duration_sec": 1336.63
   },
-  "stats": {},
-  "error": "interrupted"
+  "stats": {
+    "frames_processed": 2254,
+    "total_detections": 9132,
+    "total_events": 14,
+    "events_by_type": {
+      "zone_intrusion": 8,
+      "loitering": 6
+    },
+    "elapsed_sec": 1327.52,
+    "avg_fps": 1.7
+  },
+  "error": null
 }
