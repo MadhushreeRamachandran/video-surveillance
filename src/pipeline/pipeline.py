@@ -127,7 +127,6 @@ class SurveillancePipeline:
         anchor: str = "foot",
         annotate: bool = True,
         draw_zones: bool = True,
-
         preprocessors: Sequence[Stage] = (),
     ) -> None:
         self.engine = ZoneEventEngine(zones, publisher=publisher, anchor=anchor)

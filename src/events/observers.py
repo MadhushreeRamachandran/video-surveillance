@@ -87,14 +87,24 @@ class CsvEventLogger(EventObserver):
     def on_event(self, event: Event) -> None:
         d = event.to_dict()
         x1, y1, x2, y2 = d["bbox"]
-        self._writer.writerow({
-            "event_id": d["event_id"], "event_type": d["event_type"],
-            "zone_id": d["zone_id"], "zone_name": d["zone_name"],
-            "track_id": d["track_id"], "frame": d["frame"],
-            "timestamp_sec": d["timestamp_sec"], "timecode": d["timecode"],
-            "x1": x1, "y1": y1, "x2": x2, "y2": y2,
-            "confidence": d["confidence"], "details": json.dumps(d["details"]),
-        })
+        self._writer.writerow(
+            {
+                "event_id": d["event_id"],
+                "event_type": d["event_type"],
+                "zone_id": d["zone_id"],
+                "zone_name": d["zone_name"],
+                "track_id": d["track_id"],
+                "frame": d["frame"],
+                "timestamp_sec": d["timestamp_sec"],
+                "timecode": d["timecode"],
+                "x1": x1,
+                "y1": y1,
+                "x2": x2,
+                "y2": y2,
+                "confidence": d["confidence"],
+                "details": json.dumps(d["details"]),
+            }
+        )
         self._fh.flush()
 
     def close(self) -> None:

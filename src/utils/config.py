@@ -23,8 +23,11 @@ class DetectorConfig:
 
     def as_kwargs(self) -> Dict[str, Any]:
         return dict(
-            weights=self.weights, conf_threshold=self.conf_threshold,
-            iou_threshold=self.iou_threshold, imgsz=self.imgsz, device=self.device,
+            weights=self.weights,
+            conf_threshold=self.conf_threshold,
+            iou_threshold=self.iou_threshold,
+            imgsz=self.imgsz,
+            device=self.device,
         )
 
 
@@ -65,6 +68,7 @@ class OutputConfig:
     @property
     def manifest_path(self) -> Path:
         return self.output_dir / "run_manifest.json"
+
 
 @dataclass
 class PreprocessConfig:

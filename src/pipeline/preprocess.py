@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 _ANALYSIS_WIDTH = 640  
 
+
 def _small_gray(image: np.ndarray) -> tuple[np.ndarray, float]:
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     h, w = gray.shape[:2]
@@ -22,8 +23,6 @@ def _small_gray(image: np.ndarray) -> tuple[np.ndarray, float]:
 
 
 class LowLightStage(Stage):
-   
-
     def __init__(
         self,
         on_below: float = 85.0,
@@ -83,7 +82,6 @@ class LowLightStage(Stage):
 
 
 class StabilizationStage(Stage):
-    
     def __init__(
         self,
         max_shift_frac: float = 0.05,
@@ -117,7 +115,7 @@ class StabilizationStage(Stage):
             )
             self.frames_corrected += 1
 
-        ctx.original = ctx.image  
+        ctx.original = ctx.image
         return ctx
 
     def _estimate(self, gray: np.ndarray) -> np.ndarray:

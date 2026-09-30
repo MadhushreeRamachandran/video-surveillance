@@ -34,7 +34,6 @@ class _DetectionBatch:
         return len(self.conf)
 
     def __getitem__(self, idx) -> "_DetectionBatch":
-        # ultralytics >= 8.4 slices detections with boolean masks (results[mask]).
         sub = object.__new__(_DetectionBatch)
         sub.conf = self.conf[idx]
         sub.cls = self.cls[idx]
@@ -67,9 +66,9 @@ class ByteTrackTracker(Tracker):
 
     def _build(self) -> BYTETracker:
         try:
-            return BYTETracker(self._args)  # ultralytics >= 8.4
+            return BYTETracker(self._args)
         except TypeError:
-            return BYTETracker(self._args, frame_rate=self._fps)  # older versions
+            return BYTETracker(self._args, frame_rate=self._fps)
 
     def update(self, detections: Sequence[Detection], frame: np.ndarray) -> List[Track]:
         out = self._tracker.update(_DetectionBatch(detections), frame)

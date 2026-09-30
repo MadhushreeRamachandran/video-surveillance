@@ -101,3 +101,28 @@
 {"time": "2026-09-30 12:27:36", "level": "INFO", "logger": "__main__", "message": "event log (csv): ..\\outputs\\lighting_test\\events.csv"}
 {"time": "2026-09-30 12:27:36", "level": "INFO", "logger": "__main__", "message": "run manifest: ..\\outputs\\lighting_test\\run_manifest.json"}
 {"time": "2026-09-30 12:27:36", "level": "INFO", "logger": "__main__", "message": "============================================================"}
+{"time": "2026-09-30 13:05:36", "level": "INFO", "logger": "__main__", "message": "============================================================"}
+{"time": "2026-09-30 13:05:36", "level": "INFO", "logger": "__main__", "message": "video surveillance pipeline starting"}
+{"time": "2026-09-30 13:05:36", "level": "INFO", "logger": "__main__", "message": "video: ..\\data\\clips\\lighting_test.mp4 | zones: ..\\data\\zones\\lighting_test.zones.json | output: ..\\outputs\\lighting_test"}
+{"time": "2026-09-30 13:05:36", "level": "INFO", "logger": "__main__", "message": "device: cpu"}
+{"time": "2026-09-30 13:05:36", "level": "INFO", "logger": "__main__", "message": "============================================================"}
+{"time": "2026-09-30 13:05:36", "level": "INFO", "logger": "utils.video_io", "message": "opened lighting_test.mp4: 3840x2160 @ 29.97 fps (~586 frames)"}
+{"time": "2026-09-30 13:05:36", "level": "INFO", "logger": "detectors.yolo_detector", "message": "loading yolov8n.pt on cpu (half=False)"}
+{"time": "2026-09-30 13:05:52", "level": "INFO", "logger": "events.zones", "message": "loaded 1 zone(s) from ..\\data\\zones\\lighting_test.zones.json (normalized coordinates)"}
+{"time": "2026-09-30 13:05:52", "level": "INFO", "logger": "__main__", "message": "preprocess: LowLightStage"}
+{"time": "2026-09-30 13:05:52", "level": "INFO", "logger": "__main__", "message": "detector: yolov8 (weights=yolov8n.pt, conf=0.15)"}
+{"time": "2026-09-30 13:05:52", "level": "INFO", "logger": "__main__", "message": "tracker: bytetrack"}
+{"time": "2026-09-30 13:05:52", "level": "INFO", "logger": "__main__", "message": "zones: Road Surface[road_zone]"}
+{"time": "2026-09-30 13:05:52", "level": "INFO", "logger": "pipeline.preprocess", "message": "low-light enhancement ON at frame 0 (mean=33)"}
+{"time": "2026-09-30 13:09:03", "level": "INFO", "logger": "pipeline.pipeline", "message": "processed 200 frames (1.0 fps, 0 events so far)"}
+{"time": "2026-09-30 13:10:18", "level": "INFO", "logger": "utils.video_io", "message": "stopping after 30 failed reads at frame 615"}
+{"time": "2026-09-30 13:10:18", "level": "INFO", "logger": "utils.video_io", "message": "wrote 293 frames to ..\\outputs\\lighting_test\\annotated.mp4 (codec=mp4v)"}
+{"time": "2026-09-30 13:10:18", "level": "INFO", "logger": "utils.video_io", "message": "lighting_test.mp4: read=293 skipped=293 dropped=30"}
+{"time": "2026-09-30 13:10:18", "level": "INFO", "logger": "__main__", "message": "============================================================"}
+{"time": "2026-09-30 13:10:18", "level": "INFO", "logger": "__main__", "message": "run complete: 293 frames in 266.1s (1.1 fps avg)"}
+{"time": "2026-09-30 13:10:18", "level": "INFO", "logger": "__main__", "message": "events: 0 total "}
+{"time": "2026-09-30 13:10:18", "level": "INFO", "logger": "__main__", "message": "annotated video: ..\\outputs\\lighting_test\\annotated.mp4"}
+{"time": "2026-09-30 13:10:18", "level": "INFO", "logger": "__main__", "message": "event log (json): ..\\outputs\\lighting_test\\events.json"}
+{"time": "2026-09-30 13:10:18", "level": "INFO", "logger": "__main__", "message": "event log (csv): ..\\outputs\\lighting_test\\events.csv"}
+{"time": "2026-09-30 13:10:18", "level": "INFO", "logger": "__main__", "message": "run manifest: ..\\outputs\\lighting_test\\run_manifest.json"}
+{"time": "2026-09-30 13:10:18", "level": "INFO", "logger": "__main__", "message": "============================================================"}
