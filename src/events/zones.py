@@ -1,4 +1,3 @@
-"""Zone definitions, JSON loading/validation, and Shapely point-in-polygon tests."""
 from __future__ import annotations
 
 import json
@@ -27,16 +26,13 @@ _EVENT_FLAGS = {"intrusion": "detect_intrusion", "loitering": "detect_loitering"
 
 @dataclass(frozen=True)
 class ZoneRules:
-    """Per-zone behaviour. All durations are in VIDEO seconds, so results don't
-    depend on processing speed or frame skipping."""
-
     detect_intrusion: bool = True
     detect_loitering: bool = True
-    loiter_seconds: float = 10.0       # stationary this long inside the zone -> loitering
-    loiter_radius_frac: float = 0.5    # "stationary" = within this fraction of person height
-    min_inside_seconds: float = 0.3    # must be inside this long before intrusion fires (debounce)
-    exit_grace_seconds: float = 2.0    # unseen-inside for this long = person has left
-    cooldown_seconds: float = 10.0     # same track + zone + event type can't re-fire within this
+    loiter_seconds: float = 10.0
+    loiter_radius_frac: float = 0.5
+    min_inside_seconds: float = 0.3
+    exit_grace_seconds: float = 2.0
+    cooldown_seconds: float = 10.0
 
     def __post_init__(self) -> None:
         if self.loiter_seconds <= 0:
@@ -49,8 +45,6 @@ class ZoneRules:
 
 
 class Zone:
-    """A named polygon. Geometry is validated and prepared once at load time."""
-
     def __init__(
         self,
         zone_id: str,
@@ -59,22 +53,21 @@ class Zone:
         rules: ZoneRules,
     ) -> None:
         if len(points) < 3:
-            raise ValueError(f"Zone '{zone_id}' needs at least 3 points")
+            raise ValueError(f"zone '{zone_id}' needs at least 3 points")
         polygon = Polygon(points)
         if not polygon.is_valid:
-            raise ValueError(f"Zone '{zone_id}' polygon is invalid: {explain_validity(polygon)}")
+            raise ValueError(f"zone '{zone_id}' polygon is invalid: {explain_validity(polygon)}")
         if polygon.area <= 0:
-            raise ValueError(f"Zone '{zone_id}' polygon has zero area")
+            raise ValueError(f"zone '{zone_id}' polygon has zero area")
 
-        shapely.prepare(polygon)  # speeds up repeated point tests
+        shapely.prepare(polygon)
         self.id = zone_id
         self.name = name
         self.polygon = polygon
         self.rules = rules
-        self.vertices = np.array(points, dtype=np.int32)  # for drawing overlays
+        self.vertices = np.array(points, dtype=np.int32)
 
     def contains(self, point: Tuple[float, float]) -> bool:
-        """True if the point is inside OR exactly on the boundary."""
         return bool(shapely.intersects_xy(self.polygon, point[0], point[1]))
 
 
@@ -86,7 +79,7 @@ def _build_rules(defaults: Dict[str, Any], zone_cfg: Dict[str, Any], where: str)
     if bad_events:
         raise ValueError(f"{where}: unknown event(s) {sorted(bad_events)}; use {sorted(_EVENT_FLAGS)}")
     unknown = set(merged) - _RULE_FIELDS
-    if unknown:  # catches typos like "loiter_second"
+    if unknown:
         raise ValueError(f"{where}: unknown setting(s) {sorted(unknown)}; valid: {sorted(_RULE_FIELDS)}")
 
     try:
@@ -100,11 +93,9 @@ def _build_rules(defaults: Dict[str, Any], zone_cfg: Dict[str, Any], where: str)
 
 
 def load_zones(path: str | Path, frame_size: Optional[Tuple[int, int]] = None) -> List[Zone]:
-    """Load zones from JSON. `frame_size` is (width, height); it is required when
-    coordinate_mode is "normalized" (coordinates as 0-1 fractions of the frame)."""
     p = Path(path)
     if not p.is_file():
-        raise FileNotFoundError(f"Zones file not found: {p}")
+        raise FileNotFoundError(f"zones file not found: {p}")
     try:
         data = json.loads(p.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
@@ -114,7 +105,7 @@ def load_zones(path: str | Path, frame_size: Optional[Tuple[int, int]] = None) -
     if mode not in ("pixel", "normalized"):
         raise ValueError("coordinate_mode must be 'pixel' or 'normalized'")
     if mode == "normalized" and frame_size is None:
-        raise ValueError("frame_size (width, height) is required for normalized coordinates")
+        raise ValueError("frame_size is required for normalized coordinates")
 
     raw_zones = data.get("zones")
     if not raw_zones:
@@ -127,7 +118,7 @@ def load_zones(path: str | Path, frame_size: Optional[Tuple[int, int]] = None) -
         zone_id = str(cfg.get("id", f"zone_{i + 1}"))
         where = f"zone '{zone_id}'"
         if zone_id in seen_ids:
-            raise ValueError(f"Duplicate zone id '{zone_id}'")
+            raise ValueError(f"duplicate zone id '{zone_id}'")
         seen_ids.add(zone_id)
 
         try:
@@ -148,5 +139,5 @@ def load_zones(path: str | Path, frame_size: Optional[Tuple[int, int]] = None) -
         rules = _build_rules(defaults, cfg, where)
         zones.append(Zone(zone_id, str(cfg.get("name", zone_id)), points, rules))
 
-    logger.info("Loaded %d zone(s) from %s (%s coordinates)", len(zones), p, mode)
+    logger.info("loaded %d zone(s) from %s (%s coordinates)", len(zones), p, mode)
     return zones

@@ -1,4 +1,3 @@
-"""Observer pattern: the engine publishes events, observers react independently."""
 from __future__ import annotations
 
 import csv
@@ -17,15 +16,13 @@ logger = logging.getLogger(__name__)
 class EventObserver(ABC):
     @abstractmethod
     def on_event(self, event: Event) -> None:
-        """Called once per event."""
+        raise NotImplementedError
 
     def close(self) -> None:
-        """Flush/release resources (called at end of run)."""
+        pass
 
 
 class EventPublisher:
-    """The Subject. Knows nothing about what observers do with events."""
-
     def __init__(self) -> None:
         self._observers: List[EventObserver] = []
 
@@ -41,21 +38,21 @@ class EventPublisher:
         for observer in list(self._observers):
             try:
                 observer.on_event(event)
-            except Exception:  # one broken observer must never stop the pipeline
-                logger.exception("Observer %s failed on event %s", type(observer).__name__, event.event_id)
+            except Exception:
+                logger.exception("observer %s failed on event %s", type(observer).__name__, event.event_id)
 
     def close(self) -> None:
         for observer in self._observers:
             try:
                 observer.close()
             except Exception:
-                logger.exception("Observer %s failed to close", type(observer).__name__)
+                logger.exception("observer %s failed to close", type(observer).__name__)
 
 
 class ConsoleLogObserver(EventObserver):
     def on_event(self, event: Event) -> None:
         logger.warning(
-            "ALERT %-14s zone=%s track=%d frame=%d t=%s conf=%.2f",
+            "alert %-14s zone=%s track=%d frame=%d t=%s conf=%.2f",
             event.event_type.value,
             event.zone_id,
             event.track_id,
@@ -66,8 +63,6 @@ class ConsoleLogObserver(EventObserver):
 
 
 class InMemoryObserver(EventObserver):
-    """Collects events in a list (used by tests and by the annotator)."""
-
     def __init__(self) -> None:
         self.events: List[Event] = []
 
@@ -76,9 +71,6 @@ class InMemoryObserver(EventObserver):
 
 
 class CsvEventLogger(EventObserver):
-    """Streams one row per event and flushes immediately, so a crash on a
-    long video still leaves a usable log."""
-
     FIELDS = [
         "event_id", "event_type", "zone_id", "zone_name", "track_id", "frame",
         "timestamp_sec", "timecode", "x1", "y1", "x2", "y2", "confidence", "details",
@@ -111,9 +103,6 @@ class CsvEventLogger(EventObserver):
 
 
 class JsonEventLogger(EventObserver):
-    """Collects events and writes one structured JSON file (metadata + summary +
-    events) on close."""
-
     def __init__(self, path: str | Path, metadata: Optional[Dict[str, Any]] = None) -> None:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -138,4 +127,4 @@ class JsonEventLogger(EventObserver):
         }
         tmp = self.path.with_suffix(self.path.suffix + ".tmp")
         tmp.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-        tmp.replace(self.path)  # atomic swap: never leaves a half-written file
+        tmp.replace(self.path)

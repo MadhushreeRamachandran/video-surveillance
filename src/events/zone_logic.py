@@ -1,9 +1,3 @@
-"""Zone intrusion + loitering engine.
-
-State is kept per (track_id, zone_id). All timing uses VIDEO timestamps.
-The engine only needs objects with .track_id, .bbox and .confidence, so it has
-no dependency on a specific tracker.
-"""
 from __future__ import annotations
 
 import logging
@@ -19,8 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 class _MeanAcc:
-    """Running mean of detection confidences (ignores 0 = predicted/coasting boxes)."""
-
     __slots__ = ("total", "n")
 
     def __init__(self) -> None:
@@ -39,10 +31,10 @@ class _MeanAcc:
 
 @dataclass
 class _ZoneState:
-    entered_at: float                    # start of this visit
-    last_seen: float                     # last time observed inside the zone
-    anchor: Tuple[float, float]          # reference position for the stationarity test
-    stationary_since: float              # when the person last settled at `anchor`
+    entered_at: float
+    last_seen: float
+    anchor: Tuple[float, float]
+    stationary_since: float
     radius: float = 0.0
     intrusion_done: bool = False
     loiter_done: bool = False
@@ -58,7 +50,7 @@ class ZoneEventEngine:
         anchor: str = "foot",
     ) -> None:
         if not zones:
-            raise ValueError("At least one zone is required")
+            raise ValueError("at least one zone is required")
         if anchor not in ("foot", "center"):
             raise ValueError("anchor must be 'foot' or 'center'")
 
@@ -72,12 +64,8 @@ class ZoneEventEngine:
         self._last_fired: Dict[Tuple[int, str, EventType], float] = {}
         self._next_event_id = 1
 
-    # ------------------------------------------------------------------ API
     def update(self, tracks: Sequence, frame_idx: int, timestamp: float) -> List[Event]:
-        """Process one frame. `timestamp` is video time in seconds
-        (frame_idx / fps). Returns the events emitted on this frame and also
-        publishes them to observers."""
-        self._expire(timestamp)  # first, so a long-gone track can't resume an old visit
+        self._expire(timestamp)
 
         emitted: List[Event] = []
         for track in tracks:
@@ -102,8 +90,6 @@ class ZoneEventEngine:
         return emitted
 
     def active_alerts(self) -> List[Tuple[int, str, EventType]]:
-        """(track_id, zone_id, event_type) currently in alert state; used to
-        colour boxes and zones in the annotated video."""
         alerts = []
         for (track_id, zone_id), st in self._states.items():
             if st.intrusion_done:
@@ -117,7 +103,6 @@ class ZoneEventEngine:
         self._last_fired.clear()
         self._next_event_id = 1
 
-    # ------------------------------------------------------------- internals
     def _point(self, track) -> Tuple[float, float]:
         x1, y1, x2, y2 = track.bbox
         cx = (x1 + x2) / 2.0
@@ -135,11 +120,9 @@ class ZoneEventEngine:
         st.last_seen = t
         st.visit_conf.add(track.confidence)
 
-        # Stationarity: tolerance scales with person height, so it adapts to perspective.
         height = max(track.bbox[3] - track.bbox[1], 1.0)
         st.radius = rules.loiter_radius_frac * height
         if math.dist(point, st.anchor) > st.radius:
-            # Person moved: restart the stationary episode from here.
             st.anchor = point
             st.stationary_since = t
             st.loiter_done = False
@@ -150,7 +133,7 @@ class ZoneEventEngine:
         rules = zone.rules
         if st.intrusion_done or (t - st.entered_at) < rules.min_inside_seconds:
             return None
-        st.intrusion_done = True  # once per visit, even if suppressed below
+        st.intrusion_done = True
         if self._in_cooldown(track.track_id, zone.id, EventType.INTRUSION, t, rules):
             return None
         return self._emit(
@@ -163,7 +146,7 @@ class ZoneEventEngine:
         stationary_for = t - st.stationary_since
         if st.loiter_done or stationary_for < rules.loiter_seconds:
             return None
-        st.loiter_done = True  # once per stationary episode
+        st.loiter_done = True
         if self._in_cooldown(track.track_id, zone.id, EventType.LOITERING, t, rules):
             return None
         return self._emit(
@@ -198,8 +181,6 @@ class ZoneEventEngine:
         return event
 
     def _expire(self, t: float) -> None:
-        """Drop states not seen inside their zone for longer than the grace period.
-        This bounds memory on long videos."""
         gone = [
             key for key, st in self._states.items()
             if (t - st.last_seen) > self._zones_by_id[key[1]].rules.exit_grace_seconds

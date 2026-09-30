@@ -1,4 +1,3 @@
-"""YOLOv8 person detector (Ultralytics)."""
 from __future__ import annotations
 
 import logging
@@ -17,13 +16,7 @@ logger = logging.getLogger(__name__)
 @register_detector("yolo")
 @register_detector("yolov8")
 class YoloDetector(Detector):
-    """Person-only detector built on pretrained COCO YOLOv8 weights.
-
-    Weights are downloaded automatically on first use (e.g. yolov8n.pt).
-    Swap model size by changing `weights` (yolov8s.pt, yolov8m.pt, ...).
-    """
-
-    PERSON_CLASS_ID = 0  # COCO class 0 = person
+    PERSON_CLASS_ID = 0
 
     def __init__(
         self,
@@ -48,23 +41,19 @@ class YoloDetector(Detector):
         self.min_box_area = min_box_area
 
         self.device = resolve_device(device)
-        # FP16 only helps (and is only reliable) on CUDA.
         self.half = is_cuda(self.device) if half is None else (half and is_cuda(self.device))
 
-        logger.info("Loading %s on %s (half=%s)", weights, describe_device(self.device), self.half)
+        logger.info("loading %s on %s (half=%s)", weights, describe_device(self.device), self.half)
         self._model = YOLO(weights)
         self._warmup()
 
-    # ------------------------------------------------------------------ API
     def detect(self, frame: np.ndarray) -> List[Detection]:
-        if frame is None or frame.size == 0:  # empty/corrupt frame -> no detections
+        if frame is None or frame.size == 0:
             return []
         result = self._model.predict(frame, **self._predict_kwargs())[0]
         return self._to_detections(result)
 
     def detect_batch(self, frames: Sequence[np.ndarray]) -> List[List[Detection]]:
-        """Run one forward pass on several frames (better GPU utilisation).
-        Output stays index-aligned with the input, even if some frames are empty."""
         valid = [i for i, f in enumerate(frames) if f is not None and f.size > 0]
         outputs: List[List[Detection]] = [[] for _ in frames]
         if not valid:
@@ -75,7 +64,6 @@ class YoloDetector(Detector):
             outputs[idx] = self._to_detections(result)
         return outputs
 
-    # ------------------------------------------------------------- internals
     def _predict_kwargs(self) -> dict:
         kwargs = dict(
             classes=[self.PERSON_CLASS_ID],
@@ -86,7 +74,7 @@ class YoloDetector(Detector):
             max_det=self.max_det,
             verbose=False,
         )
-        if self.half:  # only pass on CUDA, to avoid the deprecation warning on CPU
+        if self.half:
             kwargs["half"] = True
         return kwargs
 
@@ -100,7 +88,7 @@ class YoloDetector(Detector):
 
         detections: List[Detection] = []
         for (x1, y1, x2, y2), c in zip(xyxy, conf):
-            if (x2 - x1) * (y2 - y1) < self.min_box_area:  # drop tiny noise boxes
+            if (x2 - x1) * (y2 - y1) < self.min_box_area:
                 continue
             detections.append(
                 Detection(
@@ -113,7 +101,5 @@ class YoloDetector(Detector):
         return detections
 
     def _warmup(self) -> None:
-        """One dummy inference so the first real frame isn't slow (this matters
-        for FPS benchmarks)."""
         dummy = np.zeros((self.imgsz, self.imgsz, 3), dtype=np.uint8)
         self._model.predict(dummy, **self._predict_kwargs())

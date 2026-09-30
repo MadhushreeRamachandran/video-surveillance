@@ -1,0 +1,13 @@
+{
+  "metadata": {
+    "video": "..\\data\\clips\\lighting_test.mp4",
+    "zones": "..\\data\\zones\\lighting_test.zones.json",
+    "detector": "yolov8",
+    "tracker": "bytetrack"
+  },
+  "summary": {
+    "total_events": 0,
+    "by_type": {}
+  },
+  "events": []
+}

@@ -1,10 +1,3 @@
-"""Application logging setup + a run manifest for reproducibility.
-
-Two independent responsibilities on purpose (kept apart from events/observers.py):
-  - setup_logging(): configures Python's `logging` module (console + optional file).
-  - RunManifest: records exactly how a run was produced — config, environment,
-    package versions, timing — so results can be reproduced or debugged later.
-"""
 from __future__ import annotations
 
 import json
@@ -19,10 +12,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 
-# ------------------------------------------------------------------ logging setup
 class _JsonFormatter(logging.Formatter):
-    """One JSON object per line — greppable and machine-parseable."""
-
     def format(self, record: logging.LogRecord) -> str:
         payload = {
             "time": self.formatTime(record, "%Y-%m-%d %H:%M:%S"),
@@ -40,16 +30,9 @@ def setup_logging(
     log_file: Optional[str | Path] = None,
     json_format: bool = False,
 ) -> None:
-    """Configure the root logger. Call this once, at CLI startup.
-
-    - Console: human-readable by default; set json_format=True for structured
-      stdout (useful when logs are piped into another tool).
-    - File (if log_file is given): always JSON lines, and rotates at 5 MB with
-      3 backups, so a long-running or looping process can't fill the disk.
-    """
     root = logging.getLogger()
     root.setLevel(level.upper())
-    root.handlers.clear()  # calling this twice (e.g. in tests) shouldn't duplicate handlers
+    root.handlers.clear()
 
     console = logging.StreamHandler(sys.stdout)
     console.setFormatter(
@@ -67,12 +50,10 @@ def setup_logging(
         file_handler.setFormatter(_JsonFormatter())
         root.addHandler(file_handler)
 
-    # Ultralytics is chatty at INFO; keep it at WARNING unless we're debugging.
     if level.upper() != "DEBUG":
         logging.getLogger("ultralytics").setLevel(logging.WARNING)
 
 
-# ------------------------------------------------------------------ reproducibility
 def _package_versions() -> Dict[str, str]:
     versions = {}
     for name in ("ultralytics", "cv2", "shapely", "deep_sort_realtime", "torch", "numpy"):
@@ -109,10 +90,6 @@ def _cuda_info() -> Dict[str, Any]:
 
 @dataclass
 class RunManifest:
-    """Captures everything needed to reproduce or debug a run: the exact CLI
-    config, environment, timing and outcome. Written as JSON next to the
-    other outputs (e.g. results/run_manifest.json)."""
-
     config: Dict[str, Any]
     started_at: float = field(default_factory=time.time)
     ended_at: Optional[float] = None
@@ -152,4 +129,4 @@ class RunManifest:
         p.parent.mkdir(parents=True, exist_ok=True)
         tmp = p.with_suffix(p.suffix + ".tmp")
         tmp.write_text(json.dumps(self.to_dict(), indent=2), encoding="utf-8")
-        tmp.replace(p)  # atomic write, same technique as JsonEventLogger in Step 4
+        tmp.replace(p)

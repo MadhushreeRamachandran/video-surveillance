@@ -1,4 +1,3 @@
-"""Registry/factory for tracking strategies."""
 from __future__ import annotations
 
 from typing import Callable, Dict, List, Type
@@ -12,7 +11,6 @@ def register_tracker(name: str) -> Callable[[Type[Tracker]], Type[Tracker]]:
     def decorator(cls: Type[Tracker]) -> Type[Tracker]:
         _REGISTRY[name.lower()] = cls
         return cls
-
     return decorator
 
 
@@ -22,8 +20,6 @@ def available_trackers() -> List[str]:
 
 def create_tracker(name: str, **kwargs) -> Tracker:
     key = name.lower()
-    try:
-        cls = _REGISTRY[key]
-    except KeyError:
-        raise ValueError(f"Unknown tracker '{name}'. Available: {available_trackers()}") from None
-    return cls(**kwargs)
+    if key not in _REGISTRY:
+        raise ValueError(f"Unknown tracker '{name}'. Available: {available_trackers()}")
+    return _REGISTRY[key](**kwargs)

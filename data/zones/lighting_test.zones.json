@@ -1,0 +1,18 @@
+{
+  "coordinate_mode": "normalized",
+  "defaults": {
+    "loiter_seconds": 5,
+    "loiter_radius_frac": 0.6,
+    "min_inside_seconds": 0.3,
+    "exit_grace_seconds": 2.0,
+    "cooldown_seconds": 10
+  },
+  "zones": [
+    {
+      "id": "road_zone",
+      "name": "Road Surface",
+      "polygon": [[0.05, 0.0], [0.75, 0.0], [0.85, 1.0], [0.0, 1.0]],
+      "events": ["intrusion", "loitering"]
+    }
+  ]
+}

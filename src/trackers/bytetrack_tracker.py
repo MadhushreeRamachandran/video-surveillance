@@ -1,4 +1,3 @@
-"""ByteTrack tracker via Ultralytics' built-in implementation (motion only, no re-ID)."""
 from __future__ import annotations
 
 import logging
@@ -16,8 +15,6 @@ logger = logging.getLogger(__name__)
 
 
 class _DetectionBatch:
-    """Minimal stand-in for Ultralytics' Boxes: the attributes BYTETracker reads."""
-
     def __init__(self, detections: Sequence[Detection]) -> None:
         if detections:
             xyxy = np.array([d.bbox for d in detections], dtype=np.float32)
@@ -30,7 +27,7 @@ class _DetectionBatch:
 
         w = xyxy[:, 2] - xyxy[:, 0]
         h = xyxy[:, 3] - xyxy[:, 1]
-        self.xywh = np.stack([xyxy[:, 0] + w / 2, xyxy[:, 1] + h / 2, w, h], axis=1)  # centre format
+        self.xywh = np.stack([xyxy[:, 0] + w / 2, xyxy[:, 1] + h / 2, w, h], axis=1)
         self.xyxy = xyxy
 
     def __len__(self) -> int:
@@ -39,13 +36,6 @@ class _DetectionBatch:
 
 @register_tracker("bytetrack")
 class ByteTrackTracker(Tracker):
-    """Associates high-confidence boxes first, then rescues low-confidence ones
-    (often partly occluded people). Fast, but has no appearance model, so a person
-    who leaves and re-enters usually gets a new ID.
-
-    Feed it a LOW detector threshold (around 0.1-0.25). It needs the weak boxes.
-    """
-
     def __init__(
         self,
         track_high_thresh: float = 0.4,
@@ -69,7 +59,8 @@ class ByteTrackTracker(Tracker):
     def update(self, detections: Sequence[Detection], frame: np.ndarray) -> List[Track]:
         out = self._tracker.update(_DetectionBatch(detections), frame)
         tracks: List[Track] = []
-        for row in np.asarray(out).reshape(-1, 8) if len(out) else []:
+        rows = np.asarray(out).reshape(-1, 8) if len(out) else []
+        for row in rows:
             x1, y1, x2, y2, track_id, score = row[:6]
             tracks.append(
                 Track(

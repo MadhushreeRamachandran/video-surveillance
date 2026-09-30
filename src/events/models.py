@@ -1,4 +1,3 @@
-"""Event data model shared by the engine and all observers."""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -12,7 +11,6 @@ class EventType(str, Enum):
 
 
 def format_timecode(seconds: float) -> str:
-    """Seconds -> HH:MM:SS.mmm (video time, not wall-clock time)."""
     total_ms = int(round(seconds * 1000))
     h, rem = divmod(total_ms, 3_600_000)
     m, rem = divmod(rem, 60_000)

@@ -1,4 +1,3 @@
-"""Device selection with graceful fallback."""
 from __future__ import annotations
 
 import logging
@@ -9,8 +8,6 @@ logger = logging.getLogger(__name__)
 
 
 def resolve_device(preference: str = "auto") -> str:
-    """Return 'cuda:0', 'mps' or 'cpu'. Falls back to CPU if the requested
-    device isn't available."""
     pref = (preference or "auto").lower()
 
     if pref == "auto":
@@ -22,7 +19,7 @@ def resolve_device(preference: str = "auto") -> str:
         return "cpu"
 
     if pref.startswith("cuda") and not torch.cuda.is_available():
-        logger.warning("CUDA requested but not available; falling back to CPU.")
+        logger.warning("cuda requested but not available, falling back to cpu")
         return "cpu"
 
     return pref

@@ -1,18 +1,9 @@
-"""Typed, validated configuration for a pipeline run.
-
-Centralising config here means run.py only parses CLI args into this
-dataclass — nothing else in the codebase needs to know about argparse.
-"""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-# Trackers want different detector confidence thresholds (see Step 3):
-# DeepSORT benefits from cleaner, higher-confidence boxes for its appearance
-# embeddings; ByteTrack explicitly needs low-confidence boxes for its second
-# association pass. Used only when the user doesn't set conf_threshold explicitly.
 _DEFAULT_CONF_BY_TRACKER = {"deepsort": 0.35, "bytetrack": 0.15}
 
 _DEFAULT_TRACKER_PARAMS: Dict[str, Dict[str, Any]] = {
@@ -25,7 +16,7 @@ _DEFAULT_TRACKER_PARAMS: Dict[str, Dict[str, Any]] = {
 class DetectorConfig:
     name: str = "yolov8"
     weights: str = "yolov8n.pt"
-    conf_threshold: Optional[float] = None  # None -> resolved from tracker choice
+    conf_threshold: Optional[float] = None
     iou_threshold: float = 0.5
     imgsz: int = 640
     device: str = "auto"
@@ -93,15 +84,14 @@ class PipelineConfig:
         self.output.output_dir = Path(self.output.output_dir)
 
         if not self.video_path.is_file():
-            raise FileNotFoundError(f"Video not found: {self.video_path}")
+            raise FileNotFoundError(f"video not found: {self.video_path}")
         if not self.zones_path.is_file():
-            raise FileNotFoundError(f"Zones file not found: {self.zones_path}")
+            raise FileNotFoundError(f"zones file not found: {self.zones_path}")
         if self.frame_skip < 0:
             raise ValueError("frame_skip must be >= 0")
         if self.anchor not in ("foot", "center"):
             raise ValueError("anchor must be 'foot' or 'center'")
 
-        # Fill in tracker-aware defaults only where the caller left them unset.
         if self.detector.conf_threshold is None:
             self.detector.conf_threshold = _DEFAULT_CONF_BY_TRACKER.get(self.tracker.name, 0.35)
         if not self.tracker.params:

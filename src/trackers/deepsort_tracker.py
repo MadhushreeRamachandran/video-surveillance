@@ -1,4 +1,3 @@
-"""DeepSORT tracker (deep-sort-realtime) with appearance-based re-identification."""
 from __future__ import annotations
 
 import logging
@@ -17,25 +16,6 @@ logger = logging.getLogger(__name__)
 
 @register_tracker("deepsort")
 class DeepSortTracker(Tracker):
-    """Kalman filter (motion) + appearance embeddings (who does this person look like).
-
-    Key parameters:
-      max_age              updates a lost track is kept alive. This is your
-                           re-identification window: a person who re-enters within
-                           this many updates gets the SAME id. Note it counts
-                           tracker updates, not seconds: with frame skipping, divide
-                           by the skip factor.
-      n_init               consecutive matches before a track is confirmed. Higher
-                           values suppress flickering false positives but delay new IDs.
-      max_cosine_distance  appearance-match threshold. Lower = stricter (fewer ID
-                           swaps, more fragmentation); higher = more forgiving.
-      nn_budget            embeddings remembered per track. Caps memory use, and the
-                           gallery is what makes re-ID possible.
-      max_coast_frames     how many missed frames a confirmed track may still be
-                           returned for (predicted box). 0 returns only tracks matched
-                           to a detection this frame, so no ghost boxes.
-    """
-
     def __init__(
         self,
         max_age: int = 90,
@@ -58,29 +38,25 @@ class DeepSortTracker(Tracker):
         self._embedder = embedder
         self._use_gpu = is_cuda(resolve_device(device))
         self._tracker = self._build()
-        logger.info("DeepSORT ready (embedder=%s, gpu=%s, %s)", embedder, self._use_gpu, self._params)
+        logger.info("deepsort ready (embedder=%s, gpu=%s)", embedder, self._use_gpu)
 
     def _build(self) -> DeepSort:
         return DeepSort(
             embedder=self._embedder,
             embedder_gpu=self._use_gpu,
-            half=self._use_gpu,   # FP16 embeddings on CUDA only
-            bgr=True,             # OpenCV frames are BGR
+            half=self._use_gpu,
+            bgr=True,
             **self._params,
         )
 
-    # ------------------------------------------------------------------ API
     def update(self, detections: Sequence[Detection], frame: np.ndarray) -> List[Track]:
         if frame is None or frame.size == 0:
             return []
 
         raw = [(d.to_ltwh(), d.confidence, d.class_name) for d in detections]
-
         if raw:
             ds_tracks = self._tracker.update_tracks(raw, frame=frame)
         else:
-            # No detections: still advance the tracker so lost tracks age out
-            # and Kalman predictions move forward.
             ds_tracks = self._tracker.update_tracks([], embeds=[], frame=frame)
 
         return self._convert(ds_tracks)
@@ -88,7 +64,6 @@ class DeepSortTracker(Tracker):
     def reset(self) -> None:
         self._tracker = self._build()
 
-    # ------------------------------------------------------------- internals
     def _convert(self, ds_tracks) -> List[Track]:
         tracks: List[Track] = []
         for t in ds_tracks:
