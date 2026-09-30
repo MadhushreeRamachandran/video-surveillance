@@ -1,221 +1,194 @@
-# Video Surveillance — Detection, Tracking & Event Recognition
+# Video Surveillance: Detection, Tracking & Event Recognition
 
-A modular, CLI-driven computer vision pipeline that detects people in video, tracks them across frames with persistent IDs, and raises configurable zone-based events (intrusion, loitering). Built around **Pipeline**, **Factory**, **Strategy**, and **Observer** design patterns so each stage can be modified, replaced, or tested in isolation.
+A CLI tool that takes a video, detects and tracks people in it, and raises alerts when someone enters a restricted zone or lingers too long in one. Built for the AI/ML intern take-home assignment.
 
 ```
 python run.py --video input.mp4 --zones zones.json --output results/
 ```
 
----
+Output: an annotated video with boxes/IDs/zone overlays, plus JSON and CSV event logs.
 
-## Table of Contents
+## Architecture
 
-1. [Architecture Overview](#architecture-overview)
-2. [Model Choices](#model-choices)
-3. [Setup Instructions](#setup-instructions)
-4. [Configuration](#configuration)
-5. [Sample Results](#sample-results)
-6. [Known Limitations](#known-limitations)
-7. [Performance Notes](#performance-notes)
-
----
-
-## Architecture Overview
-
-The pipeline is a linear sequence of stages, each with a single responsibility. Frames move through the pipeline one at a time so memory use stays bounded regardless of video length.
+The pipeline is a straight line of stages. Each frame flows through all of them in order, and each stage only knows about the one before it.
 
 ```
-┌────────────┐     ┌─────────────┐     ┌────────────┐     ┌────────────┐     ┌────────────┐
-│  Video I/O │ --> │  Detection  │ --> │  Tracking  │ --> │   Event    │ --> │   Output   │
-│ (frames)   │     │  (YOLOv8)   │     │ (DeepSORT/ │     │ Detection  │     │ (video +   │
-│            │     │             │     │ ByteTrack) │     │ (zones)    │     │  logs)     │
-└────────────┘     └─────────────┘     └────────────┘     └────────────┘     └────────────┘
-      │                    │                  │                  │                  │
- utils/video_io.py   detectors/          trackers/           events/            utils/logger.py
-                     (Factory)           (Strategy)          (Observer)
+video file
+   |
+   v
+[ VideoReader ]        reads frames one at a time, keeps real timestamps
+   |
+   v
+[ Detection Stage ]    YOLOv8 finds people in the frame
+   |
+   v
+[ Tracking Stage ]     DeepSORT/ByteTrack assigns/keeps IDs across frames
+   |
+   v
+[ Event Stage ]        checks each tracked person against the zone polygons
+   |
+   v
+[ Annotation Stage ]   draws boxes, IDs, zones, alerts on the frame
+   |
+   v
+[ VideoWriter ] + [ JSON/CSV loggers ]
 ```
 
-**Stage responsibilities**
+I used four patterns to keep this modular:
 
-| Stage | Module | Role |
-|---|---|---|
-| Video I/O | `utils/video_io.py` | Reads frames (with optional stride/resize), writes the annotated output video, handles corrupt/empty frames |
-| Detection | `detectors/` | Runs YOLOv8 on each frame, returns bounding boxes + confidence scores for the "person" class |
-| Tracking | `trackers/` | Assigns persistent IDs across frames, re-identifies people who leave and re-enter the frame |
-| Event Detection | `events/` | Checks track positions against zone polygons, raises `zone_intrusion` and `loitering` events |
-| Output / Logging | `utils/logger.py` | Writes `events.csv` / `events.json` and `tracks.csv`; draws overlays onto the output video |
+- **Pipeline** – the stages above are separate classes (`DetectionStage`, `TrackingStage`, `EventStage`, `AnnotationStage`) run in sequence by `SurveillancePipeline`. Adding a new stage means writing one class, not touching the others.
+- **Factory** – `create_detector("yolov8")` and `create_tracker("deepsort")` build objects from a name. Swapping models is a config change.
+- **Strategy** – DeepSORT and ByteTrack both implement the same `Tracker` interface, so the pipeline doesn't care which one is running.
+- **Observer** – event logging (console, JSON, CSV) is done by observers that subscribe to an `EventPublisher`. The zone logic doesn't know or care who's listening.
 
-**Design patterns and why each one fits**
+Frames are streamed one at a time through the whole thing — nothing loads the full video into memory, so runtime scales with video length, not with how much RAM you have.
 
-- **Pipeline Pattern** — the five stages above are chained as a sequence of independent, swappable steps. A stage only needs to know the shape of the data it receives and produces, not how upstream/downstream stages work internally.
-- **Factory Pattern** — `detectors/detector_factory.py` builds the configured detector (e.g. YOLOv8n/s/m) from a config string, so adding a new detector doesn't require touching the pipeline or CLI.
-- **Strategy Pattern** — trackers implement a common interface (`update(detections) -> tracks`), so DeepSORT and ByteTrack are interchangeable at runtime via `--tracker`.
-- **Observer Pattern** — `EventLogger` (in `utils/logger.py`) subscribes to the event detector and is notified via `update(event)` whenever a zone event fires. This decouples "detecting an event" from "persisting an event," so additional observers (e.g. a live dashboard, an alert webhook) can be added without changing event-detection logic.
+## Model choices
 
----
+**Detector: YOLOv8n (nano)**
 
-## Model Choices
+I picked the nano variant because this is a real-time streaming use case, not a batch analysis job. YOLOv8n runs usably fast even on CPU, at the cost of some accuracy on small/distant people. I considered Faster R-CNN, which is generally more accurate on small objects, but it's a two-stage detector and noticeably slower — a bad fit if this ever needs to run on more than a handful of cameras. If accuracy on small/far-away people becomes a real problem, the fix is swapping to `yolov8s.pt` or `yolov8m.pt` — same code, different weights file, since the detector is behind a Factory.
 
-| Component | Chosen | Why | Alternatives considered |
-|---|---|---|---|
-| Object detector | **YOLOv8n** (Ultralytics) | Best speed/accuracy trade-off for CPU/edge-friendly inference; small model size; active maintenance and simple Python API; free/open license | YOLOv8s/m (higher accuracy, slower — used when GPU is available), Faster R-CNN (too slow for near-real-time use), SSD-MobileNet (faster but noticeably lower accuracy on small/occluded people) |
-| Tracker (default) | **DeepSORT** | Appearance embeddings help re-identify people after occlusion or brief exits from frame, which the assignment explicitly requires | ByteTrack (faster, motion-only — offered as `--tracker bytetrack` for high-FPS/low-occlusion scenes), SORT (no appearance model, more ID switches) |
-| Tracker (alternative) | **ByteTrack** | Associates low-confidence detections instead of discarding them, which helps in crowded scenes; no embedding network, so it's lighter and faster | Kept as a Strategy option rather than the default because it re-identifies less reliably after a full occlusion |
-| Zone geometry | **Shapely polygons** | Robust point-in-polygon and overlap checks for arbitrary (non-rectangular) zones defined in `zones.json` | Manual bounding-box overlap math (rejected: doesn't support arbitrary polygons) |
+**Tracker: DeepSORT (default), ByteTrack (alternative)**
 
-**Rule of thumb used in this project:** DeepSORT + YOLOv8n is the default because re-identification accuracy matters more than raw speed for surveillance; ByteTrack is offered for throughput-sensitive deployments where brief ID switches are acceptable.
+The assignment specifically asks for re-identification — a person leaving and re-entering the frame should keep the same ID. Only an appearance-based tracker can do that, which is why DeepSORT is the default: it uses a small CNN to embed each detected person and match them by appearance, not just position.
 
----
+The cost is speed — that embedding step runs per person per frame, and it's the main reason this pipeline is slow on CPU. ByteTrack is the alternative: pure motion-based tracking, no appearance model, much faster, but a person who's out of frame for more than a couple of seconds will get a new ID when they come back. I'd use ByteTrack over DeepSORT for crowded scenes on limited hardware where speed and occlusion-robustness matter more than long-term re-identification.
 
-## Setup Instructions
+Both are selectable with `--tracker deepsort` or `--tracker bytetrack`.
 
-### Requirements
-- Python 3.9+
-- pip
-- (Optional) CUDA-capable GPU for faster inference
+## Setup
 
-### Install
+Requires Python 3.9–3.12.
+
+**With uv (what I used):**
 
 ```bash
-git clone https://github.com/MadhushreeRamachandran/video-surveillance.git
-cd video-surveillance
 uv sync
-cd src
+uv run python run.py --video input.mp4 --zones zones.json --output results/
 ```
 
-`requirements.txt` includes: `ultralytics`, `deep-sort-realtime`, `opencv-python`, `shapely`, `numpy`.
-
-### Run
+**With plain pip:**
 
 ```bash
-uv run python run.py --video ..\data\clips\lighting_test.mp4 --zones ..\data\zones\lighting_test.zones.json --output ..\outputs\lighting_test --tracker bytetrack --conf 0.15 --frame-skip 1
-
+python -m venv .venv
+source .venv/bin/activate        # .venv\Scripts\activate on Windows
+pip install -r requirements.txt
+python run.py --video input.mp4 --zones zones.json --output results/
 ```
 
-### CLI options
-
-| Flag | Required | Default | Description |
-|---|---|---|---|
-| `--video` | Yes | — | Path to input video file |
-| `--zones` | Yes | — | Path to zones config JSON |
-| `--output` | Yes | — | Output directory for video + logs |
-| `--detector` | No | `yolov8n` | Detector model name/weights |
-| `--tracker` | No | `deepsort` | `deepsort` or `bytetrack` |
-| `--conf` | No | `0.4` | Detection confidence threshold |
-| `--stride` | No | `1` | Process every Nth frame (speed/accuracy trade-off) |
-| `--device` | No | auto | `cpu`, `cuda`, or `cuda:0` |
-| `--log-level` | No | `INFO` | `DEBUG`, `INFO`, `WARNING` |
-
-### Outputs (written to `--output`)
-
-```
-results/
-├── annotated.mp4     # video with boxes, IDs, zone overlays, event banners
-├── events.csv        # streamed event log (crash-safe)
-├── events.json        # final event log + run summary
-└── tracks.csv         # per-frame bounding boxes + confidence (MOT-format friendly)
-```
-
----
+YOLOv8n weights download automatically on first run. No GPU needed — it auto-detects CUDA and falls back to CPU.
 
 ## Configuration
 
-### `zones.json`
-
-Zones are arbitrary polygons in pixel coordinates, each with its own event rules.
+**Zones** are polygons defined in a JSON file, in normalized (0–1) coordinates so the same file works regardless of resolution:
 
 ```json
 {
+  "coordinate_mode": "normalized",
+  "defaults": {
+    "loiter_seconds": 10,
+    "min_inside_seconds": 0.3,
+    "exit_grace_seconds": 2.0,
+    "cooldown_seconds": 10
+  },
   "zones": [
     {
-      "name": "entrance",
-      "polygon": [[100, 200], [400, 200], [400, 500], [100, 500]],
-      "events": {
-        "intrusion": true,
-        "loitering": { "enabled": true, "threshold_sec": 10 }
-      }
-    },
-    {
-      "name": "restricted_area",
-      "polygon": [[600, 100], [900, 100], [900, 400], [600, 400]],
-      "events": {
-        "intrusion": true,
-        "loitering": { "enabled": false }
-      }
+      "id": "restricted_area",
+      "name": "Restricted Area",
+      "polygon": [[0.1, 0.45], [0.45, 0.45], [0.5, 0.9], [0.1, 0.9]],
+      "events": ["intrusion", "loitering"]
     }
   ]
 }
 ```
 
-- `polygon`: list of `[x, y]` pixel coordinates (any number of vertices, not just rectangles).
-- `intrusion`: fires once when a track first enters the zone.
-- `loitering.threshold_sec`: fires once a track has remained inside the zone continuously for this many seconds.
+- `loiter_seconds` — how long someone has to stay roughly still inside a zone before it counts as loitering.
+- `min_inside_seconds` — how long someone has to be inside a zone before an intrusion fires (filters out boundary flicker).
+- `exit_grace_seconds` — how long someone can be briefly out of view before their zone visit is considered over (handles short occlusions).
+- `cooldown_seconds` — stops the same person triggering the same event repeatedly.
 
-### Adjustable thresholds (CLI or config)
+Any of these can be overridden per zone. Coordinates use the person's foot position (bottom-center of the box), which lines up with where they're actually standing better than the box center does.
 
-| Parameter | Where | Purpose |
-|---|---|---|
-| `--conf` | CLI | Minimum detection confidence to keep a box |
-| `loitering.threshold_sec` | `zones.json` | Dwell time before loitering fires |
-| `dedup_window_frames` | `EventLogger` init (in `run.py`) | Suppresses repeat events for the same track/zone within N frames |
-| `--stride` | CLI | Trade FPS for lower compute by skipping frames |
-| IoU / max-age (tracker) | tracker config | Occlusion tolerance before a track ID is dropped |
+**Main CLI flags:**
 
----
+```
+--video          input video path
+--zones          zones JSON path
+--output         output folder
+--tracker        deepsort (default) or bytetrack
+--conf           detector confidence threshold
+--frame-skip     process every Nth frame, for speed
+--device         auto / cpu / cuda:0
+--no-video       skip writing the annotated video, events only
+```
 
-## Sample Results
+## Sample results
 
-
-
-- **Annotated video:** `results/annotated.mp4` — bounding boxes with track IDs, zone polygons drawn as overlays, on-screen event banners when intrusion/loitering fires.
-- **Event log excerpt (`events.json`):**
+Ran on a ~75 second indoor clip (480x360, gym/hall setting with a registration table and a seating area, both marked as zones):
 
 ```json
 {
-  "summary": {
-    "total_events": 4,
-    "events_by_type": { "zone_intrusion": 3, "loitering": 1 },
-    "unique_tracks_with_events": 3
-  },
+  "summary": { "total_events": 20, "by_type": { "zone_intrusion": 10, "loitering": 10 } },
   "events": [
     {
-      "event_id": 1,
       "event_type": "zone_intrusion",
+      "zone_name": "Registration Desk",
+      "track_id": 4,
+      "frame": 87,
+      "timecode": "00:00:02.900",
+      "confidence": 0.891
+    },
+    {
+      "event_type": "loitering",
+      "zone_name": "Seating Area",
       "track_id": 7,
-      "zone_name": "entrance",
-      "frame_number": 142,
-      "timestamp_sec": 5.68,
-      "bbox": [412.3, 210.5, 480.1, 390.2],
-      "confidence": 0.87
+      "frame": 412,
+      "timecode": "00:00:13.730",
+      "confidence": 0.763,
+      "details": { "stationary_seconds": 15.02 }
     }
   ]
 }
 ```
 
----
+The seating-area loitering events are people who were genuinely just sitting in chairs — which is correct behavior for the algorithm. It has no concept of intent, only "did this person stay roughly still, in this zone, past the threshold." Whether that's actually suspicious depends entirely on how zones and thresholds are set up for a real deployment.
 
-## Known Limitations
+The annotated video draws each person's box in a per-ID color, switches to red/orange with a thicker outline when they trigger an alert, and shows a small HUD (frame number, timecode, FPS, active track count) in the corner.
 
-- **Low light:** detection confidence drops noticeably in poorly lit scenes; YOLOv8n was not fine-tuned on low-light data, so recall suffers more than precision.
-- **Crowded / heavy occlusion:** dense crowds increase ID switches even with DeepSORT's appearance model; long full occlusions can still cause a track to be dropped and reassigned a new ID on reappearance.
-- **Re-identification window:** re-identification only works within DeepSORT's embedding gallery lifetime — a person absent for a very long time (well beyond `max_age`) will get a new ID.
-- **Camera motion:** the pipeline assumes a mostly static camera; pans/zooms are not compensated for and can produce spurious loitering/intrusion events.
-- **No multi-camera handoff:** each video is processed independently; there's no cross-camera identity matching.
-- **With more time, I would add:** a Kalman-filter-based motion compensation step for camera shake, a lightweight MOTA/MOTP evaluation script against MOT17 ground truth, alert deduplication across overlapping zones, and a live dashboard (stretch goals from the assignment).
+## Edge cases and how they're handled
 
----
+- **Empty or corrupt frames** — `VideoReader` skips unreadable frames instead of crashing, and only stops if it hits 30 in a row (real end of file). The detector also returns an empty list for a `None` frame instead of erroring.
+- **Occlusion (person briefly blocked from view)** — DeepSORT keeps a track alive for `max_age` frames after it stops seeing that person, and matches them back by appearance if they reappear. On the test clip, I checked a person passing near others in the seating area and their ID held across the brief overlap.
+- **ID switches** — this is a real limitation, not something I could fully solve. If someone is out of frame for longer than DeepSORT's re-identification window (default ~90 frames, about 3 seconds), they come back as a new ID. I saw this happen at least once on the test clip with someone hidden behind the bleachers for a few seconds.
+- **Crowded scenes** — the test clip's seating area has 6-8 people at once and tracking held up fine, though DeepSORT gets noticeably slower per frame as the number of people in view goes up, since it runs an embedding pass per person.
+- **Camera/codec issues** — `VideoWriter` tries a few different codecs (mp4v, avc1, XVID, MJPG) until one actually works, instead of failing on the first one that isn't supported on a given machine.
+- **Duplicate/repeated alerts** — a cooldown period stops the same person re-triggering the same event in the same zone every frame while they're still standing there. Intrusion fires once per visit, loitering once per stationary period.
+- **Low light** — I didn't get a full test run of this in with real numbers, but based on how YOLOv8n behaves, I'd expect detection confidence and recall to drop noticeably on dark/IR-style footage, since the base model is trained mostly on well-lit COCO images. This is the one edge case I'd want to validate properly with more time, ideally against real low-light CCTV footage rather than my gym clip.
 
-## Performance Notes
+## Known limitations
 
-> Placeholder — fill in with numbers from your own hardware/test clips before submission.
+- Re-identification is bounded by `max_age` — it's not true long-term re-ID. Someone gone for a minute is a new person as far as the system is concerned.
+- The loitering/intrusion logic is purely geometric and temporal. It flags patterns (stayed still, entered an area), not intent — a false "suspicious" flag on someone innocently sitting down is expected behavior, not a bug.
+- Detection confidence directly gates whether tracking and events happen at all, so anything that hurts YOLO's confidence (low light, small/distant people, heavy occlusion) quietly suppresses everything downstream of it.
+- Zones are manually drawn polygons per video. There's no automatic zone suggestion — someone has to look at a frame and decide what matters.
+- I didn't fine-tune the detector on any surveillance-specific dataset. It's pretrained COCO weights, which is fine for a prototype but would need retraining on CrowdHuman or similar for a domain like heavily crowded or overhead-camera footage.
+- No GPU was available for testing, so all numbers below are CPU-only. Performance would look very different on a GPU, especially with DeepSORT.
 
-| Setup | Detector | Tracker | Resolution | FPS (approx.) | Peak memory |
-|---|---|---|---|---|---|
-| CPU (example) | YOLOv8n | DeepSORT | 640×480 | *TBD* | *TBD* |
-| GPU (example) | YOLOv8n | DeepSORT | 640×480 | *TBD* | *TBD* |
-| GPU (example) | YOLOv8n | ByteTrack | 640×480 | *TBD* | *TBD* |
+## Performance
 
-- **GPU/CPU awareness:** `--device` selects CPU or CUDA; falls back to CPU automatically if CUDA is unavailable.
-- **Memory handling:** frames are streamed one at a time (`utils/video_io.py`), so memory use does not grow with video length; only the tracker's embedding gallery scales with the number of concurrently tracked people.
-- **Throughput tuning:** `--stride` skips frames to trade detail for speed; ByteTrack is lighter than DeepSORT since it skips the appearance-embedding network.
-- **Benchmarking:** run with `--log-level DEBUG` to see per-frame timing breakdowns (detection / tracking / event-check / write) in the console log.
+Measured on my own machine (CPU only, no GPU) with YOLOv8n + DeepSORT, no frame skipping:
+
+| | |
+|---|---|
+| Clip | 480x360, 30fps, ~75s (2254 frames) |
+| Runtime | 949 seconds (~15.8 min) |
+| Average FPS | 2.4 |
+| Memory | flat throughout — frames are streamed and written one at a time, never buffered |
+
+2.4 fps is slow, and DeepSORT's per-person embedding step is the reason — it's doing a small CNN forward pass for every tracked person, every frame, on CPU. Two ways to speed this up if needed:
+
+- `--tracker bytetrack` — no embedding step at all, much faster, at the cost of re-identification.
+- `--frame-skip N` — process every (N+1)th frame. Doesn't speed up per-frame work but cuts total frames processed.
+
+On a GPU, both the detector and DeepSORT's embedder would run substantially faster since the CNN work moves off CPU — I'd expect something closer to real-time, but I didn't have hardware to confirm that number myself.
