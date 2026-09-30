@@ -65,7 +65,7 @@ Requires Python 3.9–3.12.
 
 ```bash
 uv sync
-uv run python run.py --video input.mp4 --zones zones.json --output results/
+uv run python run.py --video ..\data\clips\lighting_test.mp4 --zones ..\data\zones\lighting_test.zones.json --output ..\outputs\lighting_test --tracker bytetrack --conf 0.15 --frame-skip 1
 ```
 
 **With plain pip:**
