@@ -24,6 +24,7 @@ class FrameContext:
     frame_idx: int
     timestamp_sec: float
     image: np.ndarray
+    original: Optional[np.ndarray] = None
     detections: List[Detection] = field(default_factory=list)
     tracks: List[Track] = field(default_factory=list)
     events: List[Event] = field(default_factory=list)
@@ -34,6 +35,9 @@ class FrameContext:
 class Stage:
     def process(self, ctx: FrameContext) -> FrameContext:
         raise NotImplementedError
+
+    def reset(self) -> None:
+        pass
 
 
 class DetectionStage(Stage):
@@ -80,7 +84,7 @@ class AnnotationStage(Stage):
         if not self.enabled:
             return ctx
         ctx.annotated = annotate_frame(
-            frame=ctx.image,
+            frame=ctx.original if ctx.original is not None else ctx.image,
             tracks=ctx.tracks,
             zones=self.zones,
             active_alerts=self.engine.active_alerts(),
@@ -123,9 +127,12 @@ class SurveillancePipeline:
         anchor: str = "foot",
         annotate: bool = True,
         draw_zones: bool = True,
+
+        preprocessors: Sequence[Stage] = (),
     ) -> None:
         self.engine = ZoneEventEngine(zones, publisher=publisher, anchor=anchor)
         self.stages: List[Stage] = [
+            *preprocessors,
             DetectionStage(detector),
             TrackingStage(tracker),
             EventStage(self.engine),
@@ -176,5 +183,6 @@ class SurveillancePipeline:
     def reset(self) -> None:
         self.engine.reset()
         for stage in self.stages:
+            stage.reset()
             if isinstance(stage, TrackingStage):
                 stage.tracker.reset()

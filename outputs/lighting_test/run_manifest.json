@@ -19,6 +19,10 @@
         "track_buffer": 60
       }
     },
+    "preprocess": {
+      "low_light": true,
+      "stabilize": false
+    },
     "frame_skip": 1,
     "anchor": "foot",
     "output_dir": "..\\outputs\\lighting_test"
@@ -26,7 +30,7 @@
   "environment": {
     "python": "3.13.7",
     "platform": "Windows-11-10.0.26200-SP0",
-    "git_commit": "3b0a853",
+    "git_commit": "ee04541",
     "packages": {
       "ultralytics": "8.4.164",
       "cv2": "5.0.0",
@@ -45,10 +49,17 @@
     "frame_count": 586
   },
   "timing": {
-    "started_at": 1790743787.3843317,
-    "ended_at": 1790743795.84214,
-    "duration_sec": 8.46
+    "started_at": 1790751223.7058544,
+    "ended_at": 1790751456.3534167,
+    "duration_sec": 232.65
   },
-  "stats": {},
-  "error": "BYTETracker.__init__() got an unexpected keyword argument 'frame_rate'"
+  "stats": {
+    "frames_processed": 293,
+    "total_detections": 135,
+    "total_events": 0,
+    "events_by_type": {},
+    "elapsed_sec": 219.25,
+    "avg_fps": 1.34
+  },
+  "error": null
 }

@@ -66,6 +66,11 @@ class OutputConfig:
     def manifest_path(self) -> Path:
         return self.output_dir / "run_manifest.json"
 
+@dataclass
+class PreprocessConfig:
+    low_light: bool = True
+    stabilize: bool = False
+
 
 @dataclass
 class PipelineConfig:
@@ -74,6 +79,7 @@ class PipelineConfig:
     detector: DetectorConfig = field(default_factory=DetectorConfig)
     tracker: TrackerConfig = field(default_factory=TrackerConfig)
     output: OutputConfig = field(default_factory=OutputConfig)
+    preprocess: PreprocessConfig = field(default_factory=PreprocessConfig)
     frame_skip: int = 0
     anchor: str = "foot"
     log_level: str = "INFO"
@@ -103,6 +109,7 @@ class PipelineConfig:
             "zones_path": str(self.zones_path),
             "detector": {"name": self.detector.name, **self.detector.as_kwargs()},
             "tracker": {"name": self.tracker.name, "params": self.tracker.params},
+            "preprocess": {"low_light": self.preprocess.low_light, "stabilize": self.preprocess.stabilize},
             "frame_skip": self.frame_skip,
             "anchor": self.anchor,
             "output_dir": str(self.output.output_dir),

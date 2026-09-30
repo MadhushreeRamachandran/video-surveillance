@@ -7,9 +7,9 @@ from pathlib import Path
 
 from detectors import create_detector
 from events import ConsoleLogObserver, CsvEventLogger, EventPublisher, JsonEventLogger, load_zones
-from pipeline import SurveillancePipeline
+from pipeline import LowLightStage, StabilizationStage, SurveillancePipeline
 from trackers import create_tracker
-from utils.config import DetectorConfig, OutputConfig, PipelineConfig, TrackerConfig
+from utils.config import DetectorConfig, OutputConfig, PipelineConfig, PreprocessConfig, TrackerConfig
 from utils.device import describe_device, resolve_device
 from utils.logger import RunManifest, setup_logging
 from utils.video_io import VideoReader, VideoWriter
@@ -38,7 +38,8 @@ def parse_args(argv=None) -> argparse.Namespace:
     p.add_argument("--device", default="auto", choices=["auto", "cpu", "cuda:0", "mps"], help="Compute device.")
     p.add_argument("--frame-skip", type=int, default=0, help="Process every (N+1)th frame.")
     p.add_argument("--anchor", default="foot", choices=["foot", "center"], help="Reference point for zone tests.")
-
+    p.add_argument("--stabilize", action="store_true", help="Compensate camera shake before detection.")
+    p.add_argument("--no-lowlight", action="store_true", help="Disable adaptive low-light enhancement.")
     p.add_argument("--no-video", action="store_true", help="Skip writing the annotated video.")
     p.add_argument("--no-zones-overlay", action="store_true", help="Don't draw zone polygons on the output video.")
     p.add_argument("--fourcc", default="mp4v", help="Video codec fourcc for the output file.")
@@ -68,6 +69,7 @@ def build_config(args: argparse.Namespace) -> PipelineConfig:
         frame_skip=args.frame_skip,
         anchor=args.anchor,
         log_level=args.log_level,
+        preprocess=PreprocessConfig(low_light=not args.no_lowlight, stabilize=args.stabilize),
     )
 
 
@@ -75,6 +77,12 @@ def build_pipeline(config: PipelineConfig, publisher: EventPublisher, video_size
     detector = create_detector(config.detector.name, **config.detector.as_kwargs())
     tracker = create_tracker(config.tracker.name, **config.tracker.as_kwargs())
     zones = load_zones(config.zones_path, frame_size=video_size)
+    preprocessors = []
+    if config.preprocess.stabilize:
+        preprocessors.append(StabilizationStage())
+    if config.preprocess.low_light:
+        preprocessors.append(LowLightStage())
+    logger.info("preprocess: %s", ", ".join(type(s).__name__ for s in preprocessors) or "none")
 
     logger.info("detector: %s (weights=%s, conf=%.2f)",
                 config.detector.name, config.detector.weights, config.detector.conf_threshold)
@@ -84,8 +92,8 @@ def build_pipeline(config: PipelineConfig, publisher: EventPublisher, video_size
     return SurveillancePipeline(
         detector=detector, tracker=tracker, zones=zones, publisher=publisher,
         anchor=config.anchor, annotate=config.output.save_video, draw_zones=config.output.draw_zones,
+        preprocessors=preprocessors,
     )
-
 
 def build_observers(config: PipelineConfig, quiet: bool) -> EventPublisher:
     publisher = EventPublisher()
